@@ -1,0 +1,1197 @@
+\documentclass[
+	12pt, oneside, a4paper, english, brazil
+]{abntex2ppgsi}
+
+\usepackage[utf8]{inputenc}		
+\usepackage{lastpage}			
+\usepackage{indentfirst}		
+\usepackage{color}				
+\usepackage{graphicx}			
+\usepackage{multirow}
+\usepackage{microtype} 			
+\usepackage{pdfpages}     
+\usepackage{algorithm}			
+\usepackage{mdwlist}			
+\usepackage[noend]{algpseudocode}			
+\usepackage{lscape}
+\usepackage{changepage}
+\usepackage{lipsum}				
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage[brazilian,hyperpageref]{backref}	 
+\usepackage[alf,abnt-etal-list=0,abnt-etal-text=it]{abntex2cite}
+
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+\renewcommand{\backref}{}
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+
+\instituicao{
+	UNIVERSIDADE DE SÃO PAULO
+	\par
+	ESCOLA DE ARTES, CIÊNCIAS E HUMANIDADES
+	\par
+	PROGRAMA DE PÓS-GRADUAÇÃO EM SISTEMAS DE INFORMAÇÃO}
+
+\titulo{Detecção de posicionamentos em redes sociais com atributos textuais e comportamentais}
+\autor{\uppercase{Laís Carraro Leme Cavalheiro}}
+\local{São Paulo}
+\data{2024}
+\orientador{Prof. Dr. Ivandré Paraboni}
+
+
+\tipotrabalho{Qualificação}
+
+\preambulo{
+Projeto de pesquisa para exame de qualificação apresentado à Escola de Artes, Ciências e Humanidades da Universidade de São Paulo como parte dos requisitos para obtenção do título de Mestre em Ciências pelo Programa de Pós-graduação em Sistemas de Informação.
+\newline \newline Área de concentração: Metodologia e Técnicas da Computação}
+
+\definecolor{blue}{RGB}{41,5,195}
+\makeatletter
+
+\hypersetup{
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={laTeX com abnTeX2 adaptado para o PPgSI-EACH-USP},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2ppgsi}{qualificação de mestrado}{dissertação de mestrado}{qualificação de doutorado}{tese de doutorado}{ppgsi}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+
+\makeatother
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0cm}  % tente também \onelineskip
+\renewcommand{\baselinestretch}{1.5}
+\makeindex
+  \clubpenalty10000
+  \widowpenalty10000
+  \displaywidowpenalty10000
+\begin{document}
+\frenchspacing 
+\imprimircapa
+\imprimirfolhaderosto*
+
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+
+Resumo.
+
+Palavras-chaves: Palavra1. Palavra2. Palavra3. etc.
+\end{resumo}
+\begin{resumo}[Abstract]
+\begin{otherlanguage*}{english}
+
+Abstract.
+
+Keywords: Keyword1. Keyword2. Keyword3. etc.
+\end{otherlanguage*}
+\end{resumo}
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+\pdfbookmark[0]{\listofquadrosname}{loq}
+\listofquadros*
+\cleardoublepage
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+\begin{siglas}
+  \item[ANEW] Affective Norms for English Words
+  \item[API] Application Programming Interface
+  \item[BERT] Bidirectional Encoder Representations from Transformers
+  \item[BiLSTM] Bidirectional Long Short-Term Memory
+  \item[BOW] Bag-of-Words
+  \item[CM] Classe Majoritária
+  \item[CNN] Convolutional Neural Network
+  \item[DNN] Deep Neural Network
+  \item[DT] Decision Tree
+  \item[FFNN] Feed-Forward Neural Network
+  \item[LR] Logistic Regression
+  \item[LSTM] Long Short-Term Memory
+  \item[MFA] Multi-factor Analysis
+  \item[MLM] Masked Language Modeling
+  \item[MLP] Multi Layer Perceptron
+  \item[MRF] Markov Random Fields
+  \item[NB] Naive Bayes
+  \item[NSP] Next Sentence Prediction
+  \item[PLN] Processamento de Língua Natural
+  \item[POS] Part-of-speech
+  \item[RF] Random Forest
+  \item[RNA] Rede Neural Artificial
+  \item[RNN] Recurrent Neural Network
+  \item[seq2seq] Sequence-to-sequence
+  \item[SGD] Stochastic Gradient Descent
+  \item[SVM] Support Vector Machine
+  \item[Tf-Idf] Term frequency-inverse document frequency
+  \item[URL] Uniform Resource Locator
+  \item[XGBoost] Extreme Gradient Boosting
+  
+\end{siglas}
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEXTO COMEÇA AQUI %%%%%%%%%%%%%%%%%%%%%%
+
+\textual
+\chapter{Introdução}
+
+Um posicionamento pode ser definido como a atitude, o ponto de vista ou o julgamento de uma pessoa em relação a uma proposição \cite{walid2021}. Em termos computacionais, a detecção de posicionamentos nas redes sociais consiste em estimar, a partir de uma coleção de textos escritos por um mesmo usuário, se o autor é contrário, favorável ou neutro em relação a um alvo \cite{semeval2016}. Este problema costuma ser abordado como uma tarefa de Aprendizado Supervisionado, com modelos de classificação que utilizam tanto atributos textuais quanto comportamentais, como atributos da rede de interações do usuário.
+
+A habilidade de detectar automaticamente o posicionamento de usuários nas redes sociais possui uma ampla gama de aplicações práticas. Na área das ciências sociais, a detecção de posicionamentos pode ser usada, por exemplo, para estimar a proporção de votos de uma população em uma eleição futura \cite{isisisnotislam}. Esta técnica também pode servir como uma ferramenta para o estudo de fenômenos causados ou intensificados pelas redes sociais, como a polarização ideológica e a disseminação de notícias falsas \cite{walid2021}.
+
+O problema de detecção de posicionamentos pode ser modelado de diferentes formas, dependendo de sua aplicação final. Alguns estudos da área abordam a detecção de posicionamentos como a classificação de um conjunto de textos relacionados a um mesmo alvo, como é o caso da competição SemEval2016 \cite{semeval2016}. Este tipo de modelo é definido como orientado a alvo, tradução livre de {\em target-based} \cite{walid2021}, e utiliza conjuntos fixos de alvos concretos, como o político Donald Trump, o agravamento do aquecimento global ou a legalização do aborto, como no córpus desenvolvido para essa mesma competição \cite{semeval2016}. A sentença a seguir, por exemplo, apresenta um posicionamento favorável ao uso de máscaras:
+
+\begin{itemize}
+    \item[] Exemplo 1: \textit{Usar máscara protege você e todos a seu redor.}
+\end{itemize}
+
+Por outro lado, trabalhos de Detecção de Rumores ou Detecção de Notícias Falsas, por exemplo, utilizam posicionamentos como uma ferramenta para avaliar a veracidade de informações, de acordo com a distribuição de respostas que concordam ou discordam de um texto raiz, como é o caso da competição RumorEval2017 \cite{rumoreval2017}. Esse tipo de modelo pode ser descrito como orientado a citação, tradução livre de {\em quote-based} ou {\em claim-based} \cite{walid2021}, e tem como objetivo identificar o posicionamento de uma resposta em relação a um texto raiz, utilizando ambos os textos como entrada, como no córpus dessa competição \cite{rumoreval2017}. Abaixo, um exemplo de um par de sentenças, em que a frase resposta concorda com a frase raiz:
+
+\begin{itemize}
+    \item[] Exemplo 2:
+    \begin{itemize}
+        \item[] \textbf{Raiz:} \textit{Usar máscara protege você e todos a seu redor.}
+        \item[] \textbf{Resposta:} \textit{Sim, todos devemos usar máscara.}
+    \end{itemize}
+\end{itemize}
+
+\chapter{Fundamentação Teórica}
+\label{sec:fundamentacao-teorica}
+
+Nesta pesquisa, a detecção de posicionamentos será modelada como um problema orientado a alvo. Dada uma tripla $(x, t, y)$, em que $x$ é uma sequência de {\em tokens}, representando o texto de entrada, $t$ é o alvo do posicionamento e $y \in \{\text{a favor}, \text{contra}\}$ representa a classe de posicionamento, um modelo deste tipo tem como objetivo inferir a classe de posicionamento $y$ a partir de $x$ e $t$ com o parâmetro $\theta$, utilizando a seguinte equação, retirada de \citeonline{condgen}:
+
+\begin{equation}
+    f (x, t; \theta) = y.
+\end{equation}
+
+A detecção computacional de posicionamentos é tipicamente modelada como uma tarefa de aprendizado de máquina supervisionado, que utiliza como entrada uma ampla gama de atributos, tais como textuais e comportamentais. Esta seção irá discorrer sobre os atributos mais comuns na literatura para a tarefa de detecção de posicionamentos em redes sociais. A seção \ref{sec:definicoes} discute a natureza dos posicionamentos nas redes sociais, e define três fenômenos que influenciam os posicionamentos. Já a seção \ref{sec:taxonomia} discorre sobre os atributos utilizados para modelar os posicionamentos de forma computacional, e introduz termos que serão utilizados ao longo das discussões do presente trabalho.
+
+\section{Posicionamentos em redes sociais}
+\label{sec:definicoes}
+
+Posicionamentos em redes sociais são motivados ou influenciados por pelo menos três fenômenos, amplamente explorados na literatura. Dentre eles, estão a polarização do discurso, a formação de câmaras de eco e o princípio da homofilia. A seguir, discutimos brevemente cada um destes conceitos.
+
+A polarização nas redes sociais é frequentemente medida pela probabilidade de interação entre indivíduos com o mesmo posicionamento em relação a determinado alvo. Quando uma rede social apresenta alto grau de polarização, membros de um grupo têm exposição mínima a membros e crenças de grupos externos, caracterizando o fenômeno conhecido como polarização de interação (tradução livre de {\em interational polarization}). Nos casos em que a polarização envolve sentimentos fortemente negativos em relação a grupos externos, o fenômeno passa a ser denominado como polarização afetiva (tradução livre de {\em affective polarization}) \cite{carley2020}.
+
+Outro aspecto importante é o das câmaras de eco (tradução livre de {\em echo chambers}). Uma câmara de eco é um agrupamento formado por usuários com produção e difusão homogênea de conteúdo, em que os usuários são expostos principalmente a postagens que reforçam suas crenças pré-existentes \cite{lucie2022}.
+
+Por fim, a homofilia é a ideia de que usuários com opiniões semelhantes tendem a ser fechados entre si em uma rede social, ou seja, a maior parte de suas interações ocorrem com usuários semelhantes \cite{homophily, espinosa2020deepreading}. Por isso, a homofilia é uma propriedade das redes sociais que pode ser interessante para a tarefa de detecção do posicionamento de um usuário, já que posicionamentos tendem a ser homogêneos dentro de comunidades devido a este fenômeno \cite{tanmoy2022, mohand2018}.
+
+\section{Atributos para detecção de posicionamentos em redes sociais}
+\label{sec:taxonomia}
+
+Com o objetivo de padronizar os termos empregados nas análises e discussões ao longo deste trabalho, foi desenvolvida uma taxonomia de atributos utilizados para a detecção de posicionamentos em redes sociais. É importante notar que a taxonomia foi desenvolvida para os propósitos deste trabalho, e não tem como objetivo englobar todas as possibilidades de atributos encontradas na literatura.
+
+Com base nas taxonomias da literatura e considerando as categorias de atributos disponibilizados no conjunto de dados a ser empregado nesta pesquisa, como apresentado na seção \ref{sec:corpus}, foram identificadas as seguintes categorias, vistas em forma de diagrama na figura \ref{fig:tax_features}:
+
+\begin{figure}[H]
+	\centering
+ 	  \caption{Diagrama da taxonomia de atributos}
+	\includegraphics[width=0.8\textwidth]{imagens/tax_features.jpg}
+	\label{fig:tax_features}
+  \source{Laís Cavalheiro, 2024}
+\end{figure}
+
+Atributos textuais têm como base o texto escrito pelos usuários da rede social. Podem ser atributos extraídos do texto ou inferidos a partir do texto. Nesta taxonomia, os atributos textuais podem ser divididos em diferentes subcategorias, que têm como base a taxonomia proposta em \citeonline{chancellor2020methods}. Atributos estruturais visam a análise da forma do texto (tamanho do texto, contagem de {\em hashtags}, URLs, etc), e atributos sintáticos têm foco em classes gramaticais e dependências sintáticas. Modelos de palavras e caracteres englobam as representações textuais mais utilizadas na área de detecção de posicionamentos ({\em Bag-of-words}, {\em n-}gramas, {\em embeddings} de palavras ou frases). Os atributos de emoção e cognição (escores ou classificações de sentimento, palavras positivas ou negativas, dicionários psicolinguísticos, etc.) foram agregados aos atributos textuais segundo o agrupamento feito em \citeonline{ferraccioli2020}. Por fim, atributos demográficos (gênero, localização, idade, etc.) podem ser informados no próprio córpus ou inferidos a partir dos textos escritos pelo usuário, e por isso foram agrupados aos atributos textuais, também segundo a classificação feita em \citeonline{ferraccioli2020}.
+
+Atributos comportamentais, por sua vez, são de especial interesse para o seguinte trabalho, por modelar o comportamento e as interações dos usuários nas redes sociais. As subdivisões dessa categoria nesta taxonomia se basearam na classificação proposta em \citeonline{walid2019}. Nessa classificação, atributos de interação representam interações diretas entre os usuários (menções a outros usuários, {\em retweets} e respostas). Os atributos de preferência mostram a preferência de conteúdo dos usuários (favoritos/{\em likes}, participação em comunidades). Por fim, os atributos de conexão modelam a conexão entre dois usuários, que pode ser bidirecional (quando ambos os usuários se seguem, o que configura uma relação denominada ``amizade'') ou unidirecional (quando apenas um dos usuários segue o outro).
+
+Observa-se na literatura de detecção de posicionamentos que atributos comportamentais são tipicamente modelados de forma atômica, como em contagens de menções \cite{paolo2017, olga2017} ou de forma relacional, como em grafos de amizades \cite{espinosa2020deepreading}.
+
+\section{Córpus para detecção de posicionamentos em redes sociais}
+\label{sec:corpus}
+
+Nesta seção, serão apresentados dois córpus para detecção de posicionamentos em redes sociais que serão utilizados nos experimentos descritos no capítulo \ref{sec:experimentos}. No estudo piloto que deu origem a este trabalho, foi identificado um único conjunto de dados publicamente disponível para detecção de posicionamentos com atributos comportamentais. Este conjunto de dados, o córpus SardiStance2020 \cite{cignarella2020}, será discutido na seção \ref{sec:sardistance}. Além disso, o grupo de pesquisa no qual a presente proposta está inserida desenvolveu um córpus deste tipo, a partir de dados da rede social {\em Twitter} do Brasil. Este conjunto de dados, o córpus UstanceBR \cite{ustancebr}, será discutido na seção \ref{sec:ustancebr}.
+
+\subsection{O córpus SardiStance2020}
+\label{sec:sardistance}
+O córpus SardiStance2020 é um conjunto de dados para detecção de posicionamentos em italiano orientado a alvo, que contém dados textuais e comportamentais. Ele foi desenvolvido para a competição EvalIta2020 \cite{cignarella2020}, com o objetivo de expandir os recursos para esta tarefa no idioma Italiano, e de investigar mais a fundo o impacto de atributos comportamentais em modelos desse tipo. A competição possuía duas tarefas. Na primeira (A), o objetivo era utilizar apenas atributos textuais. Na segunda (B), os participantes deveriam usar, também, os atributos comportamentais.
+
+Os dados foram coletados pela API do {\em Twitter} por uma busca de {\em hashtags} relacionadas ao ``Movimento das Sardinhas'', um movimento político que ocorreu na Itália em 2019 \cite{cignarella2020}. Após a anotação e filtragem dos {\em tweets} coletados, o conjunto de dados totalizou 3.242 instâncias, de classe contra, a favor ou neutro. A tabela \ref{tab:distribuicao-sardistance} apresenta a distribuição dos dados deste córpus.
+
+\begin{table}[ht]
+\centering
+\caption{Distribuição de classes do córpus SardiStance2020}
+\begin{tabular}{lllll}
+\hline
+Conjunto & A favor & Contra & Neutro & Total \\ \hline
+Treino  & 589 & 1.028 & 515 & 2.132 \\
+Teste  & 742 & 196 & 172 & 1.110 \\ \hline
+\end{tabular}
+\label{tab:distribuicao-sardistance}
+\source{Adaptado de \citeonline{cignarella2020}}
+\end{table}
+
+Além dos dados textuais, o córpus também inclui atributos comportamentais representados de maneira atômica (contagem de favoritos, {\em retweets}, amigos e seguidores) e de maneira relacional (rede de amigos, {\em retweets}, respostas e {\em quotes}). A tabela \ref{tab:estatisticas-sardistance} mostra as estatísticas descritivas do córpus SardiStance2020. 
+
+\begin{table}[ht]
+\centering
+\caption{Estatísticas descritivas do córpus SardiStance2020}
+\begin{tabular}{c c c}
+\hline
+Atributo & Número de nós & Número de arestas \\ \hline
+Amigos & 669.817 & 3.076.281 \\
+{\em Retweets} & 110.315 & 575.460 \\
+{\em Quotes} & 2.903 & 7.899 \\
+Respostas & 14.268 & 29.939 \\ \hline
+\end{tabular}
+\label{tab:estatisticas-sardistance}
+\source{Adaptado de \citeonline{cignarella2020}}
+\end{table}
+
+Apesar de o córpus conter exemplos da classe neutra, a métrica de avaliação utilizada pelos estudos que fazem uso do córpus é a média do F1 {\em score} da classe a favor e contra, como na equação abaixo traduzida de \citeonline{cignarella2020}:
+
+\begin{equation}
+F1_{medio} = \frac{F1_{a\_favor} + F1_{contra}}{2}
+\end{equation}
+
+\subsection{O córpus UstanceBR}
+\label{sec:ustancebr}
+
+O córpus UstanceBR \cite{ustancebr} é um conjunto de dados para detecção de posicionamentos em português orientado a alvo, que contém dados textuais e comportamentais. Ele é composto por 86.8 mil {\em tweets} em português, dos quais 46.8 mil foram rotulados de acordo com seu posicionamento (``contra'' ou ``a favor''). O córpus tem como foco seis alvos de interesse para o cenário político do Brasil, na época na qual ele foi desenvolvido. Estes alvos formam pares polarizados entre si: Bolsonaro e Lula; Cloroquina e Sinovac; e TV Globo e Igreja. 
+
+Os {\em tweets} integrantes do córpus foram coletados por meio de uma pesquisa por palavras-chave (``Lula'', ``Bolsonaro'', ``Cloroquina'', ``Coronavac'', ``Globo'' e ``igreja''). 
+
+Ao final do processo de anotação, cada alvo possuía por volta de 8 mil instâncias, rotuladas de forma parcialmente balanceada entre as classes ``contra'' e ``a favor''. Para cada alvo, essas instâncias foram divididas em conjuntos de treino (com 75\% das instâncias) e teste (com os 25\% restantes). A tabela \ref{tab:distribuicao-ustancebr} mostra a distribuição de classes do córpus.
+
+\begin{table}[ht]
+\caption{Distribuição de classes do córpus UstanceBR}
+\centering
+\begin{tabular}{ l   c c c}
+\hline
+Alvo	     & Contra & A favor\\
+\hline
+Bolsonaro    & 5.565   & 3.849 \\
+Lula 	     & 4.514   & 3.806 \\
+Cloroquina 	 & 3.978   & 4.017 \\
+Sinovac 	 & 4.058   & 3.915 \\
+TV Globo 	 & 3.341   & 2.672 \\
+Igreja 	     & 3.539   & 3.598 \\
+\hline
+Total 	 & 24.995  & 21.857 \\
+\hline
+\end{tabular}
+\label{tab:distribuicao-ustancebr}
+\source{Adaptado de \citeonline{ustancebr}}
+\end{table}
+
+Além do texto dos {\em tweets}, o conjunto de dados também inclui uma coleção de {\em tweets} não rolutados, que representa a {\em timeline} completa de cada usuário contemplado no córpus. Ademais, o córpus contém atributos comportamentais, compostos por identificadores anonimizados que representam a lista de amigos, seguidores e menções de cada usuário do córpus. A tabela \ref{tab:estatisticas-ustancebr} mostra as estatísticas descritivas dos atributos comportamentais, que são de especial interesse para a presente proposta de pesquisa.
+
+\begin{table}
+\caption{Estatísticas descritivas do córpus UstanceBR}
+\centering
+\begin{tabular}{ l c c c }
+\hline
+Alvo	    & Média de amigos & Média de seguidores & Média de menções \\
+\hline
+Bolsonaro 	&  774           & 1.277          & 106 \\
+Lula 	    &  919           & 1.687          & 160\\
+Cloroquina 	&  1.579          & 7.665          & 723\\
+Sinovac 	&  1.588          & 11.490         & 598\\
+TV Globo 	&  944           & 2.270          & 112\\
+Igreja 	    &  931           & 2.684          & 119\\
+\hline
+\end{tabular}
+\label{tab:estatisticas-ustancebr}
+\source{Adaptado de \citeonline{ustancebr}}
+\end{table}
+
+\section{Métodos computacionais para detecção de posicionamentos em redes sociais}
+\label{sec:metodos}
+
+Apesar de alguns estudos de detecção de posicionamentos utilizarem atributos comportamentais, como será discutido na seção \ref{sec:trabalhos-relacionados} sobre a revisão bibliográfica, o tipo de dado mais frequentemente utilizado na área são os dados textuais. Por isso, a maioria desses estudos é desenvolvida no contexto do Processamento de Língua Natural (PLN) e áreas correlatas, e fazem o uso de métodos de aprendizado de máquina neural. Por este motivo, as seções a seguir visam resumir os métodos de aprendizado neural frequentemente usados na área de PLN, além de apresentar métodos emergentes e tendências na área de detecção de posicionamentos. A seção \ref{sec:aprendizado-neural} discorre sobre o funcionamento básico de Redes Neurais Artificiais {\em Feed Forward}, Redes Neurais Recorrentes e Redes {\em Long Short-Term Memory}. A seção \ref{sec:bert}, por sua vez, discute sobre modelos {\em encoder-decoder}, conceitos básicos de atenção, {\em Transformers} e {\em Bidirectional Encoder Representations for Transformers}.
+
+\subsection{Aprendizado Neural}
+\label{sec:aprendizado-neural}
+
+Redes Neurais Artificiais (RNAs) são uma família de classificadores baseados em neurônios, unidades computacionais que simulam o funcionamento de neurônios biológicos \cite{shalev2014}. Um neurônio recebe um vetor de entrada e realiza uma transformação linear ao calcular sua soma ponderada, como na equação abaixo, adaptada de \citeonline{shalev2014}:
+
+\begin{equation}
+    SP = x_1w_1 + x_2w_2 + ... + x_nw_n + b = \sum_{i=1}^{n} x_iw_i + b
+\end{equation}
+
+Em que $x_n$ corresponde ao $n$-ésimo valor da entrada $x$, $w_n$ corresponde ao $n$-ésimo peso, e $b$ corresponde ao termo de viés. Para que uma RNA seja capaz de solucionar problemas complexos e não lineares, é necessário aplicar a esta soma ponderada uma função de ativação não linear. Um exemplo de função não linear que pode ser usada para este fim é a função sigmoide, descrita na equação abaixo, retirada de \citeonline{shalev2014}:
+
+\begin{equation} 
+	\sigma(x) = \frac{1}{1 + e^{-x}} 
+\end{equation}
+
+O tipo mais simples de RNA são as {\em Feed Forward Neural Networks} (FFNNs). Nas FFNNs, as camadas de neurônios são conectadas de forma acíclica, ou seja, a informação é sempre propagada para a frente, e passa por um determinado neurônio uma única vez. A variação mais básica de uma FFNN é o Perceptron, introduzido em \citeonline{rosenblatt1962}, que consiste em apenas um neurônio. O Perceptron possui uma camada de entrada, que recebe o vetor de entrada, uma camada oculta, em que é feito o processamento desse vetor, e uma camada de saída, na qual o resultado final é computado. Como os Perceptrons são capazes de resolver apenas problemas linearmente separáveis, é necessário adicionar camadas ocultas à rede para abordar problemas mais complexos. Um Perceptron que possui mais de uma camada oculta é conhecido como {\em Multi Layer Perceptron} (MLP). Numa rede MLP, cada neurônio em uma camada está conectado a todos os neurônios na próxima camada, e por isso recebe o nome de camada densa \cite{goodfellow2016}.
+
+As FFNNs têm como objetivo aprender o vetor de pesos $W$ e o parâmetro de viés para cada camada, minimizando o erro da saída $\hat{y}$, que é calculado a partir de uma função de perda \cite{goodfellow2016}. Como a função de perda não é convexa, sua minimização deve ser feita ao ajustar os parâmetros por tentativa e erro. Para isso, é necessário utilizar algoritmos de otimização, como o Gradiente Descendente Estocástico, ou {\em Stochastic Gradient Descent} (SGD). O SGD ajusta os pesos da rede em direção ao mínimo local da função de perda, atualizando-os em pequenos incrementos com base no gradiente. 
+
+Além disso, para que os pesos sejam atualizados sequencialmente da última camada em direção à primeira de forma eficiente, também é necessário utilizar o algoritmo de {\em Backpropagation}. Partindo da camada de saída, esse algoritmo calcula os erros e os propaga por todas as camadas, em direção à entrada, ajustando os pesos da rede. Essa abordagem permite que os pesos sejam atualizados sequencialmente, refinando gradualmente a capacidade da rede de modelar os dados de entrada \cite{shalev2014}.
+
+Apesar de as FFNNs serem capazes de resolver problemas complexos, não são ideais para processar dados sequenciais, como dados textuais. Além de esse tipo de rede aceitar apenas um tamanho fixo de entrada, sua característica acíclica não permite com que itens anteriores da sequência afetem o cálculo dos itens subsequentes \cite{pln2023}.
+
+As Redes Neurais Recorrentes, ou {\em Recurrent Neural Networks} (RNNs), diferem das FFNNs por apresentar conexões cíclicas entre neurônios, o que permite que os sinais sejam propagados através do tempo pelas camadas ocultas. Por isso, esse tipo de RNA é especializado para processar dados sequenciais, como textos, já que o valor de saída para $x_{n-1}$ influencia o cálculo do valor de saída para $x_n$ \cite{nielsen2015}.
+
+A figura \ref{fig:rnn} mostra o funcionamento básico de uma RNN. À esquerda, é possível ver o diagrama físico da rede, na forma em que ela é implementada, com um {\em loop} de {\em feedback} entre o valor de saída e as camadas ocultas. Já à direita, é possível ver uma representação de como a rede funciona em tempo de execução \cite{pln2023}.
+
+\begin{figure}[H]
+	\centering
+ 	  \caption{Diagrama de uma Rede Neural Recorrente.}
+	\includegraphics[width=0.8\textwidth]{imagens/rnn.jpg}
+	\label{fig:rnn}
+  \source{\citeonline{pln2023}}
+\end{figure}
+
+Embora as RNNs sejam projetadas para lidar especificamente com dados sequenciais, sua eficácia diminui à medida que a extensão das sequências aumenta. Isso se deve ao problema do gradiente instável (tradução livre de {\em unstable gradient}, também conhecido por {\em vanishing gradient} ou {\em exploding gradient}), que surge durante a aplicação do algoritmo de {\em Backpropagation}. O produto da multiplicação sucessiva de gradientes entre 0 e 1 tende a valores exponencialmente pequenos ({\em vanishing gradient}), enquanto a multiplicação de valores acima de 1 tende a valores exponencialmente grandes ({\em exploding gradient}). Em ambos os casos, a atualização dos pesos nas primeiras camadas da RNN é prejudicada e o aprendizado torna-se extremamente lento, dificultando o treino de redes recorrentes \cite{nielsen2015}.
+
+A rede {\em Long Short-Term Memory} (LSTM) é um tipo de RNN, e foi introduzida em \citeonline{hochreiter1997} com o objetivo de mitigar o problema do gradiente instável para o treinamento de RNNs em sequências longas \cite{pln2023}. Este tipo de rede adiciona camadas (ou portões) à unidade recorrente que são capazes de acumular e apagar (ou ``esquecer'') informações ao longo do tempo, através de pesos que são aprendidos pela rede neural \cite{goodfellow2016}.
+
+A unidade mais importante de uma LSTM é sua célula de memória, composta por três portões. O portão de entrada ({\em input gate}) é responsável por decidir quanto da informação de entrada será armazenado na célula de memória, com base na entrada e no contexto atual. O portão de esquecimento ({\em forget gate}) gerencia a remoção ou ``esquecimento'' de informações desnecessárias da célula de memória. Já o portão de saída ({\em output gate}) é responsável por decidir quanto da informação presente na célula de memória será utilizada no resultado final \cite{lstmforget2000}.
+
+Apesar de as redes LSTM terem solucionado o problema do gradiente instável no treino das RNNs, sua característica sequencial impede que o treino dessas redes seja paralelizado, e o mecanismo de portões adiciona à rede  ainda mais parâmetros que devem ser aprendidos. Ambos estes aspectos prejudicam a eficiência do treino desse tipo de rede \cite{pln2023}. Além disso, apesar dos avanços das LSTMs em lidar com dependências textuais de longo prazo, ainda havia limitações na captura de nuances contextuais em sequências extensas. Essas limitações motivaram a busca por arquiteturas mais avançadas, como os {\em Transformers}, que serão discutidas na próxima seção.
+
+\subsection{Atenção, Transformers e BERT}
+\label{sec:bert}
+
+A arquitetura {\em sequence-to-sequence}, ou {\em seq2seq}, foi projetada para abordar tarefas que envolvem a transformação de uma sequência de entrada em outra sequência de saída, como na tradução automática, sumarização textual ou em respostas a perguntas complexas \cite{pln2023}. O modelo {\em encoder-decoder} é frequentemente empregado para resolver problemas {\em seq2seq}, e é composto por dois elementos principais, o codificador e o decodificador. O codificador ({\em encoder}) processa o texto de entrada e o converte em um vetor numérico denominado vetor de contexto. Já o decodificador ({\em decoder}) processa este vetor e traduz seu resultado em texto novamente, gerando a sequência de saída. Vale ressaltar que tanto os codificadores quanto os decodificadores em modelos {\em seq2seq} são baseados em redes neurais recorrentes \cite{pln2023}.
+
+A introdução da arquitetura {\em Transformers} representou um avanço significativo nessa abordagem, por sua eficiência de processamento de sequências longas e capacidade de lidar com dependências textuais de longo prazo. Esses avanços podem ser atribuídos ao processamento paralelo de sequências e ao uso extensivo de mecanismos de atenção, respectivamente \cite{pln2023}. 
+
+Ao contrário dos modelos {\em seq2seq}, os {\em Transformers} não utilizam redes recorrentes, o que permite a paralelização do processamento de sequências, que consequentemente aumenta a eficiência do treino desses classificadores. Os componentes codificador e decodificador de um modelo desse tipo são compostos por uma ou mais camadas de sub-codificadores e sub-decodificadores. Esses sub-componentes, por sua vez, são compostos por um mecanismo {\em multi-head} de auto-atenção, que será explorado mais a fundo a seguir, e uma camada densa \cite{pln2023}.
+
+Mecanismos de atenção permitem a atribução de pesos distintos a diferentes partes da entrada ao gerar a saída. Dessa forma, é possível captar dependências de longo prazo na sequência de entrada, dando um peso maior para os itens mais relevantes, independente de sua posição no texto \cite{attention}. Os mecanismos de atenção {\em multi-head} consistem em calcular $N$ funções de atenção em paralelo, em que $N$ é o número de ``cabeças'' (ou {\em heads}), e combinar seus resultados num único valor \cite{SOUZA2023110901}. 
+
+Os modelos {\em Transformers} utilizam um mecanismo conhecido por auto-atenção (ou {\em self-attention}), que permite que o modelo ajuste dinamicamente a atenção em diferentes partes da sequência \cite{pln2023}. A partir do {\em embedding} de cada {\em token} de entrada, o mecanismo de auto-atenção cria três vetores, $Q$, $K$ e $V$. O vetor $Q$ ({\em query}) representa a consulta atual, ou seja, o item que está sendo codificado. O vetor $K$ ({\em key}) representa as outras palavras da sequência. Por fim, o vetor $V$ ({\em value}) é o valor do elemento atual da sequência, considerando todos os outros elementos. A atenção é obtida ao mutiplicar os vetores $Q$ e $K$, fornecer seu resultado para uma função {\em softmax} e multiplicar sua saída pelo vetor $V$ \cite{pln2023}.
+
+O modelo {\em Bidirectional Encoder Representations from Transformers} (BERT) é um modelo de linguagem baseado no componente codificador da arquitetura {\em Transformers} \cite{SOUZA2023110901}. Um dos diferenciais dos modelos {\em BERT} é seu processamento bidirecional do texto. Ao contrário de modelos anteriores, que operavam de forma unidirecional, ou seja, processavam o texto apenas da esquerda para a direita ou apenas da direita para a esquerda, este modelo foi treinado em ambas as direções. Dessa forma, ele é capaz de considerar não somente o contexto de palavras anteriores, mas também de palavras posteriores, o que permite a captura de relações mais complexas entre as palavras \cite{pln2023}.
+
+O treino de modelos {\em BERT} para tarefas específicas consiste nas etapas de pré-treinamento e ajuste fino ({\em fine-tuning}). Na etapa de pré-treinamento, o modelo é alimentado com grandes quantidades de texto não rotulado de forma bidirecional, e treinado para as tarefas de {\em Masked Language Modeling} (MLM) e {\em Next Sentence Prediction} (NSP). Na primeira, uma ou mais palavras são mascaradas em um texto de entrada, e o modelo é treinado para prever as palavras mascaradas com base no contexto ao redor delas. Já na segunda, o modelo é treinado para prever se uma frase $B$ pode ou não ser uma continuação lógica para outra frase $A$ anterior \cite{SOUZA2023110901}. Apesar de existirem versões do modelo {\em BERT} treinadas com textos em diversos idiomas, são frequentes os modelos que focam em apenas um idioma, como os modelos {\em BERTimbau} \cite{SOUZA2023110901} e {\em BERTabaporu} \cite{bertabaporu}, em português.
+
+Após o pré-treinamento, o modelo pode ser ajustado ({\em fine-tuned}) para tarefas específicas, como detecção de posicionamentos, detecção de notícias falsas, entre outros. Nesta etapa, é necessário um córpus rotulado especificamente para a tarefa em questão.
+
+\section{Considerações}
+
+Este capítulo apresentou conceitos básicos da área de detecção de posicionamentos, mostrou dois córpus para essa tarefa e discorreu sobre alguns dos principais métodos computacionais frequentemente utilizados na área, com ênfase em modelos neurais. Estes conceitos serão empregados nos trabalhos relacionados discutidos no capítulo \ref{sec:trabalhos-relacionados}, nos experimentos realizados no capítulo \ref{sec:experimentos} e na proposta de pesquisa a ser apresentada no capítulo \ref{sec:proposta}.
+
+\chapter{Trabalhos relacionados}
+\label{sec:trabalhos-relacionados}
+
+Neste capítulo, serão apresentados os trabalhos encontrados através de uma revisão sistemática de estudos de detecção de posicionamentos utilizando atributos comportamentais, e de uma revisão exploratória complementar. A seção \ref{sec:planejamento-conducao} discorre sobre o planejamento e a condução da revisão sistemática. Em seguida, os resultados gerais são apresentados na seção \ref{sec:visao-geral}, e a seção \ref{sec:visao-detalhada} apresenta uma visão detalhada dos trabalhos encontrados em ambas as revisões.
+
+\section{Planejamento e condução}
+\label{sec:planejamento-conducao}
+
+A revisão sistemática conduzida para este trabalho teve como objetivo identificar o estado-da-arte na área de detecção de posicionamentos em redes sociais com atributos textuais e comportamentais. Mais especificamente, foram definidas as seguintes questões de pesquisa da revisão sistemática (QRS):
+
+\begin{enumerate}
+    \item[QRS 1.] Quais são os tipos de atributos textuais e comportamentais utilizados em estudos da área?
+    \item[QRS 2.] Como os atributos textuais e comportamentais são combinados nestes estudos?
+    \item[QRS 3.] Quais são os idiomas dos conjuntos de dados utilizados em modelos que utilizam dados textuais?
+\end{enumerate}
+
+\begin{quadro}[H]
+	\centering
+	\caption{Buscas da revisão sistemática}
+		\begin{tabular}{| p{0.8in} | p{0.8in} | p{2.5in} | p{0.8in} |} \hline
+
+		Repositório	& Data & Filtros & Resultados \\ \hline
+		IEEE	& 02/06/2022 & Tópicos ``learning (artificial intelligence)'', ``social networking (online)'', ``pattern classification'' e ``text analysis''  & 157 \\ \hline
+		IEEE	& 25/08/2022 & Tópicos ``social networking (online)'', ``text analysis'' e ``feature extraction''  & 145 \\ \hline
+		ACM	  & 15/09/2022 & [Title: ``stance''] AND [Abstract: ``stance''] AND [Publication Date: (01/01/2016 TO 12/31/2022)]  & 137 \\ \hline
+		Teses da USP	& 15/09/2022 & Contém a palavra ``stance'' no título e no resumo  & 0 \\ \hline
+		Banco de teses da Capes	& 15/09/202   & Grande área do conhecimento ``Ciências exatas e da Terra''  & 1 \\ \hline
+        Periódicos da Capes	& 15/09/2022 & Revisados por pares, em inglês e português, das áreas ``Technology'' e ``Computer Science''. Foram excluídos os assuntos ``Engineering'' e ``Robotics''	& 180 \\ \hline
+    ACL Anthology	& 15/09/2022 & Contém a palavra ``stance'' em qualquer campo & 145 \\ \hline
+		\end{tabular}
+	\label{tab:BuscasRS}
+  \source{Laís Cavalheiro, 2024}
+\end{quadro}
+
+Com o objetivo de respoder às questões definidas, foram realizadas consultas a diversas bases de dados científicas, no período de 2016 a 2022. Para evitar a perda de artigos relevantes, a única palavra-chave utilizada, em todas as buscas, foi {\em ``stance''} (``posicionamento'' em inglês). Para refinar os resultados e excluir artigos de temas irrelevantes, foram aplicados filtros, de acordo com aqueles disponíveis em cada repositório utilizado como fonte de pesquisa. O quadro \ref{tab:BuscasRS} relaciona os repositórios de pesquisa, a data em que a busca foi realizada, os filtros aplicados e o número de estudos resultantes.
+
+Foram encontrados 765 estudos no total. Após a conclusão das buscas, essa lista foi refinada por meio da avaliação dos seguintes critérios de inclusão (i) e exclusão (e):
+
+\begin{enumerate}
+    \item[i1.] Os trabalhos devem estar disponíveis integralmente em bases de dados científicas.
+    \item[i2.] Os trabalhos devem tratar sobre detecção de posicionamentos com dados de redes sociais.
+    \item[i3.] Os trabalhos devem ser uma revisão bibliográfica da área, ou propor um classificador ou um córpus que utiliza atributos comportamentais, mesmo que não sejam utilizados atributos textuais.
+    \item[e1.] Serão excluídos trabalhos publicados antes de 2016.
+    \item[e2.] Serão excluídos trabalhos não relacionados a Processamento de Língua Natural ou Análise de Redes Sociais.
+    \item[e3.] Serão excluídos estudos de detecção de posicionamentos que propõem classificadores ou córpus que utilizam apenas atributos textuais.
+\end{enumerate}
+
+Foram incluídos apenas os artigos que atenderam a todos os critérios de inclusão e não atenderam a nenhum critério de exclusão. Após essa avaliação, foram mantidos 63 artigos. Para os estudos primários selecionados, foram analisados os critérios de qualidade listados abaixo, associados às seguintes pontuações:
+
+\begin{enumerate}
+    \item[q1.] O trabalho tem como foco específico o problema de classificação de posicionamentos. (10 pontos)
+    \item[q2.] O trabalho realiza comparações entre diferentes combinações de características textuais e comportamentais. (20 pontos)
+    \item[q3.] O trabalho é uma revisão sistemática de estudos da área. (5 pontos)
+\end{enumerate}
+
+Os critérios foram utilizados apenas para estabelecer uma ordem de priorização da leitura dos estudos primários incluídos, já que todos foram considerados relevantes.
+
+Para a fase de extração de dados, os artigos foram lidos integralmente, ao mesmo tempo em que foi preenchida uma planilha de extração. Além das informações básicas, como dados bibliográficos, data de publicação e resumo, a planilha descreve a seguinte lista de atributos atributos relacionados às questões de pesquisa:
+
+\begin{itemize}
+     \item Problema.
+     \begin{itemize}
+         \item Definição do problema, segundo a classificação descrita no capítulo \ref{sec:fundamentacao-teorica} (classificação de posicionamentos, detecção de rumores, notícias falsas, entre outros).
+         \item Tipo de alvo, segundo a classificação descrita no capítulo \ref{sec:fundamentacao-teorica} ({\em target-based} ou {\em quote-based}).
+     \end{itemize}
+    \item Córpus.
+    \begin{itemize}
+        \item Nome que identifica o córpus, se houver.
+        \item Idioma do córpus.
+        \item Número total de exemplos, tanto positivos quanto negativos.
+        \item Rede social da qual os dados foram extraídos.
+    \end{itemize}
+    \item Atributos textuais: estruturais/sintáticos, modelos de palavras, emoção/cognição ou demográficos, segundo a taxonomia descrita na seção \ref{sec:taxonomia}.
+    \item Atributos comportamentais: interação (menções, {\em retweets} e respostas), preferência (favoritos, participação em comunidades) ou conexão (seguidores e amigos), segundo a taxonomia descrita na seção  \ref{sec:taxonomia}.
+    \item Método.
+    \begin{itemize}
+        \item Algoritmo(s) utilizados no trabalho, tanto algoritmos de classificação ou regressão quanto algoritmos auxiliares usados para análise de redes, por exemplo.
+        \item Método utilizado para combinar os atributos textuais e comportamentais, como combinação em vetor único, {\em ensembles}, {\em stacks} de modelos ou voto majoritário.
+    \end{itemize}
+\end{itemize}
+
+\section{Resultados - Visão geral}
+\label{sec:visao-geral}
+
+Após a leitura dos trabalhos selecionados de acordo com os critérios da seção anterior, alguns estudos foram eliminados por fugirem do escopo do trabalho. A lista final totalizou 40 artigos, e cada um dos atributos listados anteriormente foram analisados. 
+
+Em função do grande número de critérios analisados, foi necessário adotar uma codificação, ilustrada no quadro \ref{tab:Dicio}, com o objetivo de permitir a visualização completa da síntese da revisão sistemática. Esse quadro mostra o nome completo dos atributos e seu nome resumido, que foi utilizado no quadro final. Para cada atributo, são listados todos os valores que ele pode assumir, e os valores não listados foram codificados como ``o'' (Outros).
+
+\begin{quadro}[H]
+	\caption{Critérios adotados na síntese da revisão sistemática}
+    \tiny
+    \centering
+	\begin{tabular}{
+            | p{1.5in} | p{0.5in} | p{3in} |
+        }
+        \hline
+        Critério & Código & Legenda \\ \hline
+        \multirow{5}{*}{ Definição (def) }
+            & stance & Classificação de Posicionamentos \\
+            & rumor & Detecção de Rumores \\
+            & fake & Detecção de Notícias Falsas \\ 
+            & rede & Análise de Redes Sociais \\
+            & córpus & Criação de Córpus \\ \hline
+        \multirow{2}{*}{ Alvo }
+            & t & orientados a alvo ({\em target-based}) \\ 
+            & q & orientados a citação ({\em quote-based}) \\ \hline
+        \multirow{5}{*}{ Córpus }
+            & semeval & SemEval2016 \cite{semeval2016} \\
+            & rumor & RumorEval2017 \cite{rumoreval2017} \\
+            & pheme & PHEME \cite{pheme} \\
+            & conref & ConRef-STANCE-ita \cite{paolo2019} \\ \hline
+        \multirow{6}{*}{ Idioma }
+            & ar & Árabe \\ 
+            & in & Inglês \\ 
+            & it & Italiano \\ 
+            & es & Espanhol \\ 
+            & fr & Francês \\ 
+            & pt & Português \\ \hline
+        \multirow{7}{*}{ Tamanho (N) } 
+            & 1 & $< 5K$ \\ 
+            & 2 & $5K < N < 10K$ \\ 
+            & 3 & $10K < N < 50K$ \\ 
+            & 4 & $50K < N < 100K$ \\ 
+            & 5 & $100K < N < 500K$ \\ 
+            & 6 & $500K < N < 1M$ \\ 
+            & 7 & $> 1M$ \\ \hline
+        \multirow{3}{*}{ Rede Social (rede) } 
+            & tw & Twitter \\ 
+            & rd & Reddit \\
+            & fb & Facebook \\ \hline
+       \multirow{4}{*}{\shortstack[l]{Atributos textuais\\ (atr. textuais)}}
+            & struct & Estruturais ou sintáticos (tamanho do texto, contagem de {\em hashtags}, URLs, classes gramaticais) \\ 
+            & word & Modelos de palavras/caracteres (BOW, Word Embeddings) \\ 
+            & emo & Emoção e Cognição (sentimento, psicolonguístico) \\ 
+            & demo & Demográficos (localização, idade, gênero, partido político)\\ 
+            \hline
+        \multirow{3}{*}{\shortstack[l]{Atributos comportamentais\\ (atr. comport)}}
+            & inter & Interação (menções, {\em retweets}, respostas) \\ 
+            & pref & Preferência (favoritos, participação em comunidades) \\ 
+            & conex & Conexão (amizade, seguidores/seguindo) \\ 
+            \hline
+        \multirow{14}{*}{ Algoritmo (alg) }
+            & svm & Support Vector Machine \\ 
+            & lr & Logistic Regression \\ 
+            & nb & Naive Bayes \\ 
+            & rf & Random Forest \\ 
+            & lstm & Long Short-Term Memory \\ 
+            & dt & Decision Tree \\ 
+            & cnn & Convolutional Neural Network \\
+            & mlp & Multi Layer Perceptron \\ 
+            & dnn & Deep Neural Network \\ 
+            & rnn & Recurent Neural Network \\ 
+            & xgb & Extreme Gradient Boosting \\ 
+            & cd & Community Detection \\ 
+            & g & Grafos \\ 
+            & bert & Bidirectional Encoder Representations for Transformers \\ \hline
+        \multirow{4}{*}{ Combinação }
+            & concat & Concatenação em vetor único \\ 
+            & voto maj & Voto majoritário \\ 
+            & similar & Similaridade de usuários \\ 
+            & max & Maximização de função que utiliza todos os atributos \\ \hline
+        \end{tabular}
+	\label{tab:Dicio}
+  \source{Laís Cavalheiro, 2024}
+\end{quadro}
+
+A síntese da revisão sistemática é apresentada no quadro \ref{tab:Dicio}, e foi ordenada por ano de publicação, do mais antigo para o mais recente. A tabela \ref{tab:Contagens_comportamentais}, por sua vez, apresenta estatísticas descritivas dos atributos comportamentais da síntese realizada, e a tabela \ref{tab:Contagens_textuais} apresenta as estatísticas dos atributos textuais.
+
+\begin{quadro}[H]
+	\caption{Síntese da revisão sistemática}
+        \tiny
+    \centering
+    \begin{adjustwidth}{-0.8cm}{}
+	\begin{tabular}{
+            | p{1.0in} | p{0.7in} | p{0.8in} | p{0.6in} | p{0.2in} | p{0.3in} | 
+            p{0.4in} | p{0.1in} | p{0.3in} | p{0.15in} | p{0.5in} |
+        } \hline
+
+        Estudo & atr. comport. & atr. textuais & combinação & rede & idioma & córpus & N & def & alvo & algoritmo \\ \hline
+        
+        \citeonline{kentaro2016} & inter & struct emo word & concat & tw & in & semeval & 1 & stance & t & lr\\ \hline
+        \citeonline{tahar2017} & inter & struct word & similar & tw & ar in & o & 3 & stance & t & svm\\ \hline
+        \citeonline{paolo2017} & inter & struct emo & concat & tw & in & semeval & 1 & stance & t & nb\\ \hline
+        \citeonline{olga2017} & inter & struct emo & concat & tw & in & rumor & 2 & rumor & q & xgb\\ \hline
+        \citeonline{masooda2017} & conex inter & struct word emo & concat & tw & in & o & 6 & stance & t & svm dt nb\\ \hline
+        \citeonline{yuan2017} & inter & struct emo & max & o & in & o & 7 & stance & q & o\\ \hline
+        \citeonline{daniel2017} & conex inter pref & struct word & concat & tw & in & rumor & 2 & rumor & q & cnn lstm\\ \hline
+        \citeonline{feaster2017} & conex inter & struct emo demo & o & tw & in & o & 1 & stance & t & rf\\ \hline
+        \citeonline{mohand2018} & conex inter & struct demo & similar & tw & in fr & o & 7 & stance & t & cd\\ \hline
+        \citeonline{ku2018} & pref & emo & max & fb & in & o & 3 & stance & t & o\\ \hline
+        \citeonline{singh2018} & inter pref & struct word emo demo & concat  & tw & in & rumor & 2 & rumor & q & svm nb dt mlp\\ \hline
+        \citeonline{isabelle2018} & inter pref & struct word & concat & tw & in & pheme & 1 & rumor & q & lstm o\\ \hline
+        \citeonline{b.2018} & inter & emo & - & tw & ar & o & 7 & rede & q & g\\ \hline
+        \citeonline{andrew2019} & conex & demo & concat & tw & in & semeval & 1 & stance & t & lr\\ \hline
+        \citeonline{walid2019} & conex inter pref & struct word & concat & tw & in & semeval & 1 & stance & t & svm\\ \hline
+        \citeonline{paolo2019} & conex inter & struct & concat & tw & it & conref & 1 & stance & t & svm\\ \hline
+        \citeonline{xia2019} & conex inter pref & struct emo & concat & tw & in & rumor & 2 & rumor & q & svm rf nb lr dt\\ \hline
+        \citeonline{lee2019} & conex & struct word demo & concat & tw & in & o & 2 & stance & t & mlp\\ \hline
+        \citeonline{ramakrishnan2019} & conex & word & concat & tw & in & pheme & 2 & rumor & q & rnn\\ \hline
+        \citeonline{paolo_brexit2020} & inter pref & struct word emo & concat & tw & in & o & 2 & stance & t & svm\\ \hline
+        \citeonline{paolo_multi2020} & conex inter pref & struct word emo & concat & tw & in o & semeval & 3 & stance & t & svm lr nb\\ \hline
+        \citeonline{aono2020} & conex inter pref & struct & concat & tw rd & in & rumor & 2 & rumor & q & lstm\\ \hline
+        \citeonline{mounia2020} & inter & struct word demo & concat & tw & es & o & 7 & stance & t & xgb\\ \hline
+        \citeonline{carley2020} & inter & struct word emo & o & tw & in & o & 7 & rede & t & -\\ \hline
+        \citeonline{abdelzaher2020} & inter & word & max & tw & in & o & 2 & stance & t & o \\ \hline
+        \citeonline{becker2020} & conex inter pref & struct demo & - & tw & pt & o & 5 & rede & t & -\\ \hline
+        \citeonline{giancarlo2020} & inter pref & struct word demo & - & tw & it & o & 7 & rede & t & cd\\ \hline
+        \citeonline{das2020} & inter & word & - & tw & in & o & - & rede & t & g\\ \hline
+        \citeonline{mark2020} & inter pref & struct word emo & - & tw & in & o & 3 & córpus & q & -\\ \hline
+        \citeonline{carolina2020} & conex inter & struct word & concat & tw & in & rumor & 3 & rumor & q & lr rf mlp bert\\ \hline
+        \citeonline{li2021} & conex pref & word & concat & tw & in & pheme & 1 & fake & q & dnn\\ \hline
+        \citeonline{hu2021} & inter pref & word emo & concat & tw & it & conref & 1 & stance & t & svm lstm\\ \hline
+        \citeonline{ayaz2021} & conex inter pref & word emo demo & concat & tw & in & o & 5 & rumor & q & svm rf nb lr\\ \hline
+        \citeonline{m.2021} & inter & emo & - & tw & in & o & 7 & rede & t & -\\ \hline
+        \citeonline{lucie2022} & inter pref & word demo & o & rd & in & o & 1 & stance & t & svm lr rf\\ \hline
+        \citeonline{tanmoy2022} & conex & struct word & voto maj & tw & in & o & 5 & stance & t & cnn lstm\\ \hline
+        \citeonline{sunderraman2022} & inter pref & struct word & -  & tw & in & o & 7 & córpus & q & -\\ \hline
+        \citeonline{kiat2022} & conex inter pref & struct word emo & concat & tw & in & o & 1 & rumor & q & mlp\\ \hline
+        \citeonline{stefan2022} & inter pref & word & o & o & in & o & 5 & rede & t & bert\\ \hline
+        \citeonline{walid2022} & conex inter & - & concat & tw & in & semeval & 1 & stance & t & svm\\ \hline
+		\end{tabular}
+    \end{adjustwidth}
+	\label{tab:ResumoRS}
+  \source{Laís Cavalheiro, 2024}
+\end{quadro}
+
+\begin{table}
+    \caption{Estatísticas de atributos comportamentais}
+    \centering
+    \begin{tabular}{ l l }
+        \hline
+        Atributos comportamentais & Estudos \\
+        \hline
+        interação & 11 \\
+        interação, preferência & 9 \\
+        conexão, interação e preferência & 6 \\
+        conexão e interação & 6 \\
+        conexão & 4 \\
+        preferência & 1 \\
+        \hline
+    \end{tabular}
+    \label{tab:Contagens_comportamentais}
+    \source{Laís Cavalheiro, 2024}
+\end{table}
+
+\begin{table}
+    \caption{Estatísticas de atributos textuais}
+    \centering
+    \begin{tabular}{ l  l }
+        \hline
+        Atributos textuais & Estudos \\
+        \hline
+        estruturais, modelos de palavras & 7 \\
+        estruturais, emoção e modelos de palavras & 7 \\
+        modelos de palavras & 5 \\
+        estruturais, emoção & 4 \\
+        \hline
+    \end{tabular}
+    \label{tab:Contagens_textuais}
+    \source{Laís Cavalheiro, 2024}
+\end{table}
+
+Vemos na segunda coluna do quadro \ref{tab:ResumoRS} a frequência do uso dos atributos comportamentais de interação (menções, {\em retweets} e respostas), preferência (favoritos e comunidades) e conexão (amigos e seguidores), resumida na tabela \ref{tab:Contagens_comportamentais}. Os atributos comportamentais mais frequentes na literatura são os de interação \cite{m.2021, das2020}, e o par mais frequente é o de interação e preferência \cite{stefan2022, sunderraman2022}. Os três atributos também são frequentemente utilizados em conjunto \cite{kiat2022}, assim como o par conexão e interação \cite{walid2022}. Essas observações respondem a parte da pergunta ``{\em QRS1. Quais são os tipos de atributos textuais e comportamentais utilizados em estudos da área?}'', no que diz respeito aos atributos comportamentais.
+
+Já a terceira coluna do quadro \ref{tab:ResumoRS}, resumida na tabela \ref{tab:Contagens_textuais}, mostra a frequência de uso dos atirbutos textuais. É possível observar que os atributos estruturais (baseados em {\em hashtags}, URLs, pontuações, etc), são os mais usados \cite{aono2020, paolo2019}. Isso se deve ao uso frequente de atributos baseados em {\em hashtags} em modelos de de detecção de posicionamentos. Além disso, modelos de palavras (BOW e {\em embeddings} textuais) também são escolhas comuns \cite{stefan2022, das2020}, o que já era esperado, já que o texto de um {\em post} é o atributo mais explorado na literatura de detecção de posicionamentos em redes sociais. A tabela \ref{tab:Contagens_textuais} mostra, também, que atributos relacionados à emoção e cognição (dicionários de sentimento, psicolinguísticos, etc) são bastante populares em classificadores para esta tarefa \cite{m.2021, b.2018}. Essas observações respondem a pergunta {\em QRS1}, no que diz respeito a atributos textuais.
+
+Na quarta coluna do quadro \ref{tab:ResumoRS}, vemos que o método mais comum de combinação dos atributos é a concatenação em vetor único, feita em 23 trabalhos, como em \citeonline{walid2022}. Duas formas pouco exploradas de combinação de atributos foram a utilização de similaridades, em dois estudos \cite{tahar2017, mohand2018}, e do voto majoritário, em apenas um \cite{tanmoy2022}. Essa análise responde a questão ``{\em QRS 2. Como os atributos textuais e comportamentais são combinados nestes estudos?}''.
+
+A quinta coluna do quadro \ref{tab:ResumoRS} mostra que os estudos analisados trabalham majoritariamente com dados do Twitter \cite{walid2022, kiat2022}, apesar de terem sido encontrados alguns trabalhos que utilizam dados do Reddit \cite{aono2020, lucie2022}, e de outros fórums e redes sociais menos explorados na literatura \cite{yuan2017, ku2018, stefan2022}.
+
+Quanto à sexta coluna do quadro \ref{tab:ResumoRS}, vemos que 34 dos 40 estudos utilizam córpus em inglês \cite{walid2022, stefan2022}, enquanto apenas um aborda o problema em português \cite{becker2020}, o que evidencia a necessidade de explorar mais este idioma para a tarefa em questão. Um idioma que vem ganhando popularidade é o italiano, com a competição EvalIta2020 \cite{cignarella2020}. Essas observações respondem à última questão da revisão sistemática, ``{\em QRS 3. Quais são os idiomas dos conjuntos de dados utilizados, em modelos que utilizam dados textuais?}''.
+
+Dentre os córpus mais frequentes em estudos da área, como mostra a sétima coluna do quadro \ref{tab:ResumoRS}, estão o SemEval2016 \cite{semeval2016}, RumorEval2017 \cite{rumoreval2017}, PHEME \cite{pheme} e ConRef-STANCE-ita \cite{paolo2019}. Como o córpus SemEval2016 possui originalmente apenas atributos textuais, todos os estudos da revisão sistemática que utilizaram este córpus fizerm uso da API do {\em Twitter} para o {\em download} de atributos comportamentais, como em \citeonline{walid2022} e \citeonline{paolo_multi2020}. Tanto o córpus RumorEval2017 quanto o córpus PHEME são orientados a citação, enquanto os outros dois são orientados a alvo.
+
+É importante notar, como visto na oitava coluna do quadro \ref{tab:ResumoRS} que a maioria dos estudos utiliza um córpus com menos de 5 mil exemplos \cite{walid2022, kiat2022}, e mais da metade utiliza córpus com menos de 10 mil exemplos \cite{abdelzaher2020, aono2020}. Isso contrasta com o córpus UstanceBR, a ser utilizado no presente estudo, que possui 46.8 mil instâncias (cf. seção \ref{sec:ustancebr}).
+
+Segundo a nona coluna do quadro \ref{tab:ResumoRS}, vemos que a definição de problema mais comum entre os trabalhos encontrados é a Classificação de Posicionamentos ({\em stance}) \cite{walid2022, tanmoy2022}, seguida pela Detecção de Rumores ({\em rumor}) \cite{kiat2022, ayaz2021}. Olhando para o tipo de alvo, na décima coluna, vemos que a maior parte dos estudos é orientado a alvo ({\em t}) \cite{walid2022, stefan2022}, enquanto menos da metade é orientado a citação ({\em q}) \cite{kiat2022, sunderraman2022}.
+
+Por fim, a última coluna do quadro \ref{tab:ResumoRS} mostra que os três algoritmos mais utilizados em estudos da área são modelos de aprendizado supervisionado, dentre eles o {\em Support Vector Machine} (SVM) \cite{walid2022, lucie2022}, seguido pela Regressão Logística (ou {\em Logistic Regression}, LR) \cite{lucie2022, ayaz2021} e o {\em Naive Bayes} (NB) \cite{ayaz2021, paolo_multi2020}. Dos 40 artigos encontrados, apenas 12 utilizaram modelos baseados em redes neurais, como LSTM, RNN ou CNN, e o algoritmo neural mais utilizado foi a rede neural {\em Long Short-Term Memory} (LSTM), em apenas cinco trabalhos \cite{daniel2017, isabelle2018, aono2020, hu2021, tanmoy2022}. Quanto aos modelos baseados na arquitetura {\em Bidirecional Encoder Representations from Transformers} (BERT), apenas dois trabalhos da revisão sistemática os utilizaram \cite{stefan2022, carolina2020}, assim como um encontrado na revisão exploratória \cite{espinosa2020deepreading}.
+
+\section{Resultados - Visão detalhada}
+\label{sec:visao-detalhada}
+
+Após a análise geral dos resultados, foram selecionados os 24 artigos de maior afinidade com o trabalho que será desenvolvido, para maior detalhamento de seus método e resultados. Foi selecionado, também, um trabalho da competição EvalIta2020 \cite{espinosa2020deepreading}, que foi encontrado através de uma revisão exploratória, e que não foi incluído na revisão sistemática por não se encontrar em nenhum dos repositórios pesquisados. Dessa forma, 25 estudos no total serão analisados com mais profundidade nesta seção.
+
+Os estudos selecionados podem ser divididos em abordagens baseadas em representações atômicas de atributos comportamentais, e baseadas em representações relacionais (cf. seção \ref{sec:taxonomia}). O estudo \citeonline{espinosa2020deepreading} terá um enfoque maior na segunda categoria, pois ele será empregado como sistema de {\em baseline} nos experimentos descritos no capítulo 4.
+
+\subsection{Abordagens baseadas em representações atômicas de atributos comportamentais}
+
+Abordagens baseadas em representações atômicas de atributos comportamentais utilizam esses atributos de forma simplificada (cf. seção \ref{sec:taxonomia}). Representações atômicas incluem contagens (número de amigos, seguidores, menções, etc) e {\em flags}, variáveis booleanas que indicam uma interação na rede social (ter ou não uma amizade, ser ou não um {\em retweet}, etc). A seguir, discutimos brevemente os estudos desse tipo identificados na revisão da literatura.
+
+Em \citeonline{kentaro2016}, os autores comparam um modelo neural (CNN) e um modelo baseado em atributos (regressão logística) para o córpus SemEval2016 \cite{semeval2016}. Os atributos comportamentais utilizados foram as respostas e menções, que foram transformadas em {\em flags} que indicam se o {\em tweet} é uma resposta ou não, e se possui ou não alguma menção. Os atributos textuais incluíram modelos de palavras, dependências sintáticas, classes gramaticais e atributos de emoção/cognição. Apesar de o modelo baseado em atributos ter tido um resultado melhor do que o modelo neural, não se destacaram os atributos comportamentais, mas sim apenas os atributos de emoção/cognição.
+
+Outros dois trabalhos que utilizaram a representação de {\em flags} foram \citeonline{masooda2017} e \citeonline{daniel2017}, com a {\em flag retweet}. Em \citeonline{masooda2017}, foram usadas também a {\em flag} menção e a contagem de seguidores. Além de terem usado atributos textuais comuns (modelos de palavras, sintáticos e estruturais), os autores criaram também o atributo {\em argumentativeness}, uma variável booleana que informa se o {\em tweet} é argumentativo ou não, extraída de um dicionário de palavras pré-existente. Após a classificação com uma SVM, o atributo {\em argumentativeness} obteve o melhor resultado, já que conseguiu separar com precisão a classe neutra das duas outras classes argumentativas, e o segundo melhor atributo foi a {\em flag retweet}.
+
+Por outro lado, a {\em flag retweet} não se mostrou importante no modelo proposto em \citeonline{daniel2017}. Com o texto dos {\em tweets}, é feito um {\em embedding} de palavras, que passa por uma camada LSTM e depois por uma CNN. Em seguida, o resultado dessa camada é concatenado a atributos auxiliares, dentre eles a {\em flag retweet} e a contagem de respostas e favoritos. Por fim, o resultado passa por mais duas camadas de LSTM até chegar no resultado final. Apesar de o método proposto ter superado todos os {\em baselines} da competição RumorEval2017 \cite{rumoreval2017}, os atributos comportamentais se mostraram os menos importantes.
+
+Já os trabalhos em \citeonline{paolo2017} e \citeonline{olga2017} mostram como a contagem de menções pode impactar negativamente em modelos de detecção de posicionamento. O modelo de \citeonline{paolo2017} se apoia em informações contextuais (dicionários com partidos políticos, nomes de políticos e sua filiação), e também utiliza atributos textuais de emoção/cognição, estruturais e contagens de menções. Os resultados apontam que o melhor atributo foram as informações contextuais, enquanto a contagem de menções deteriorou os resultados. Uma das propostas para estudos futuros foi a de utilizar uma representação relacional para o atributo de menções, já que os autores observaram que seu potencial foi pouco explorado.
+
+De forma semelhante, o modelo proposto em \citeonline{olga2017} também utiliza contagem de menções, além de atributos textuais estruturais (tamanho do texto, contagem de pontuações, {\em hashtags}), com um classificador XGBoost. A contagem de menções também impactou negativamente o resultado do classficador, e foi excluída do modelo final.
+
+O estudo de \citeonline{singh2018} aborda tanto a detecção de posicionamentos quanto a detecção de rumores, comparando uma abordagem neural com LSTMs a uma abordagem baseada em atributos, em sua maioria textuais (modelos de palavras, emoção/cognição, sintáticos e estruturais), mas que também incluem contagens de {\em retweets} e seguidores. Para a tarefa de detecção de posicionamentos, a abordagem neural se provou mais eficaz, mas para a tarefa de detecção de rumores, a abordagem baseada em atributos superou a neural. A análise de atributos mostrou que o conjunto de atributos textuais foi mais importante do que o conjunto de atributos comportamentais para os modelos de Naive Bayes e árvore de decisão.
+
+O modelo proposto em \citeonline{ramakrishnan2019} também aborda tanto a tarefa de detecção de rumores quanto a tarefa de detecção de posicionamentos, utilizando o texto dos {\em tweets} em conjunto com contagens de atributos comportamentais (número de amigos, número de seguidores, número de {\em tweets}). O texto dos {\em tweets} é utilizado para criar dois {\em embeddings} de palavras específicos, um para a detecção de posicionamentos e outro para a detecção de rumores. Ambos os {\em embeddings} passam por uma LSTM compartilhada, e seu resultado é fornecido para LSTMs específicas. O resultado de cada LSTM é concatenado, então, aos atributos comportamentais, e assim é criado o escore de posicionamento e o escore de rumor, que são somados para gerar o resultado de cada classificação. Os atributos comportamentais se provaram eficientes não só para a detecção de rumor, mas também para a detecção de posicionamentos. Além disso, o escore de rumor também se provou útil na classificação de posicionamentos.
+
+Outro trabalho de detecção de rumores foi feito em \citeonline{xia2019}, que combina modelos de palavras, sentimento, atributos estruturais e sintáticos, e contagens de atributos comportamentais (número de seguidores, número de {\em retweets} e número de favoritos).  Apesar de os atributos comportamentais melhorarem o resultado do classificador, os autores apontam que os atributos textuais são imprescindíveis, e sem eles o resultado do modelo é inferior aos {\em baselines} de comparação.
+
+O trabalho de \citeonline{ayaz2021} utiliza a detecção de posicionamentos para detectar rebeldes nas rede sociais, ou seja, avalia o posicionamento dos usuários em relação a mudanças forçadas no governo de seu país. O classificador se baseia principalmente nos dados textuais. O texto dos {\em tweets} de cada usuário é convertido em um grafo sintático, que conecta os verbos aos sujeitos e objetos da frase. Os grafos posteriormente transformados em um {\em graph embedding} pelo algoritmo {\em graph2vec}. São usadas, também, contagens de atributos comportamentais (contagem de seguidores, amigos, favoritos, {\em retweets} e menções). No entanto, como apontado pelos autores, a distribuição dessas contagens se mostrou muito similar entre as classes. Dessa forma, o {\em embedding} superou tanto o modelo treinado apenas com as contagens quanto o modelo que uniu estes dois atributos.
+
+Outro exemplo de modelo que utiliza um processamento simples para atributos comportamentais é aquele proposto em \citeonline{hu2021}. Os atributos de preferência (número de favoritos) e de interação (número de {\em retweets}) são utilizados para treinar uma SVM, em conjunto com atributos textuais de emoção/cognição (atributos psicolinguísticos e de sentimento). O vetor é fornecido como entrada para uma camada de atributos auxiliares de uma rede neural profunda. Esta rede neural também possui uma camada de {\em embeddings} para receber os textos dos {\em tweets}, uma camada de atenção {\em multi-head}, e uma camada {\em softmax} para o cálculo da classe prevista. Após a análise da importância de atributos, os autores observaram que os atributos comportamentais foram indispensáveis para o modelo proposto. 
+
+O modelo de \citeonline{li2021} une tanto uma representação simples, de contagens, quanto uma representação relacional de atributos comportamentais. O modelo proposto fornece diferentes canais de entrada para uma única rede neural profunda. O primeiro deles fornece {\em embeddings} {\em GloVe} do texto do {\em tweet} \cite{glove} a uma LSTM, o segundo modela um grafo direcionado de menções representado por um vetor {\em one-hot}, e o último fornece contagens simples de atributos textuais estruturais ({\em hashtags} e {\em URLs}) e comportamentais de interação ({\em retweets} e menções) e de preferência (favoritos). Apesar de o modelo ter sido originalmente desenvolvido para detecção de notícias falsas, os autores aplicaram o mesmo modelo em um córpus de detecção de posicionamentos. Os resultados mostram que o modelo proposto superou o {\em baseline} treinado apenas com dados textuais, com especial importância dos atributos de contagem de URLs e {\em hashtags}, mas sem destaque para a contagem de atributos comportamentais.
+
+O modelo proposto em \citeonline{kiat2022} também processa os atributos de interação de uma forma simples, além de incluir atributos textuais, e os concatena em um vetor único. Este modelo usa medidas de topologia de rede, que incluem contagens de atributos comportamentais (respostas, {\em retweets} e menções). O classificador utilizado foi o {\em Multi Layer Perceptron} (MLP), e o modelo treinado com essas medidas foi o que obteve a melhor performance dentre os modelos analisados, o que pode ser atribuído à habilidade da topologia de fornecer ao classificador informações referentes à relação semântica entre diferentes comentários.
+
+
+\subsection{Abordagens baseadas em representações relacionais de atributos comportamentais}
+
+Abordagens baseadas em representações relacionais de atributos comportamentais modelam relações de rede social (amizade, seguidores, menções) de forma mais explícita, em forma de representação vetorial, grafos, entre outras (cf. seção \ref{sec:taxonomia}). A seguir, discutimos brevemente os estudos desse tipo identificados na revisão da literatura.
+
+Em \citeonline{espinosa2020deepreading} os autores tiraram proveito das informações textuais, utilizando modelos textuais baseados em BERT, e informações comportamentais, como os metadados da rede social e os atributos de rede. Ao extrair informações de ambas as fontes, além de se aproveitar de métodos poderosos de classificação textual, o modelo assim definido obteve o primeiro lugar na competição EvalIta2020 \cite{cignarella2020}. 
+
+O classificador final de \citeonline{espinosa2020deepreading} utilizou conjuntos de atributos diversos. Dentre os atributos baseados em texto, podemos citar os atributos psicológicos, que são estilos de comunicação e traços de personalidade extraídos da API Symanto\footnote{API Symanto disponível em \url{https://symanto-research.github.io/symanto-docs/\#introduction}.}, e atributos de emoção, extraídos do dicionário {\em Affective Norms for English Words} (ANEW) \cite{anew}, adaptado para o Italiano. Além disso, o modelo final englobou três variações de modelos BERT adaptadas para o idioma Italiano, dentre eles o modelo Italian BERT XXL\footnote{Modelo Italian BERT XXL disponível em \url{https://github.com/dbmdz/berts}.}, o modelo UmBERTo\footnote{Modelo UmBERTo disponível em \url{https://github.com/musixmatchresearch/umberto}.} e o modelo GilBERTo\footnote{Modelo GilBERTo disponível em \url{https://github.com/idb-ita/GilBERTo}.}.
+
+Foram utilizados, também, atributos comportamentais. Dentre eles, podemos citar métricas de atividades no {\em Twitter}, como contagens de seguidores, amigos e data da criação da conta. Além disso, foi modelada uma rede de amigos, da qual foram extraídas as distâncias médias entre cada usuário e o grupo de usuários a favor, contra e neutros, provenientes do conjunto de treino.
+
+O destaque deste trabalho se dá pela combinação entre os atributos textuais e comportamentais. Como apontado no estudo, o problema de utilizar modelos textuais baseados em BERT em conjunto com atributos comportamentais é o de que a dimensionalidade do vetor resultante do primeiro é significativamente superior à dimensionalidade do segundo, causando um desbalanceamento que poderia dar mais peso às predições do modelo textual. A solução aplicada por \citeonline{espinosa2020deepreading} foi extrair a probabilidade de cada classe resultante do modelo textual, e utilizar este vetor como um atributo, ao invés do próprio {\em embedding}. Este vetor é unido ao vetor de atributos comportamentais, e o resultado final é computado por um classificador XGBoost. Diversas combinações de atributos foram testadas em diferentes modelos, e o modelo final utiliza o resultado de todos estes modelos preliminares. A estratégia para a combinação dos seus resultados foi uma votação ponderada pela medida F1 de treino de cada classificador.
+
+O aumento mais significativo na medida F1 do modelo ocorreu após a adição dos atributos da rede de amigos, indicando que a noção de homofilia (cf. seção \ref{sec:definicoes}) se aplica a este conjunto de dados. Outra melhoria significativa no resultado em \citeonline{espinosa2020deepreading} foi devida aos atributos do modelo de linguagem BERT, sugerindo que os dados textuais também são muito relevantes para tarefas de detecção de posicionamentos. O trabalho de \citeonline{espinosa2020deepreading} mostrou que tanto as informações textuais quanto as comportamentais são importantes para a tarefa de detecção de posicionamentos. No entanto, os autores apontam que as informações baseadas em redes poderiam ser mais exploradas em trabalhos futuros, devido às indicações claras de que possuem uma importância excepcional para a tarefa.
+
+O estudo de \citeonline{yuan2017} teve o objetivo de identificar se dois usuários concordam entre si, em uma abordagem {\em quote-based}, comparando os dois textos e determinando se eles concordam ou discordam. Para esse fim, primeiramente são criadas distribuições de palavras neturas, positivas e negativas, a partir de {\em tweets} de usuários com posicionamentos conhecidos. Depois disso, é criada uma rede de respostas entre os usuários, com a indicação de se eles concordam entre si ou discordam entre si. A partir da rede e do modelo textual, um algoritmo de Expectation Maximization divide os usuários em 2 grupos, a partir de uma função objetivo. Os resultados apontam que tanto o modelo completo (com o modelo textual e a rede de interações) quanto o modelo que utiliza somente a rede de interações superaram o modelo treinado apemas com dados textuais.
+
+O trabalho em \citeonline{tahar2017} se aproveitou da homofilia das redes sociais (cf. seção \ref{sec:definicoes}), ao utilizar a estratégia de computar a similaridade dos usuários em relação aos seus atributos comportamentais e classificar novos usuários em um espaço de similaridade de usuários. Os atributos comportamentais utilizados no estudo foram de interação (menções, {\em retweets} e respostas) e os textuais foram estruturais (URLs e {\em hashtags}), além de ter sido construído um {\em baseline} utilizando como atributo apenas unigramas com o texto dos {\em tweets} e como classificador uma SVM. Primeiramente, foi possível observar que a técnica proposta de cálculo de similaridades superou os resultados do {\em baseline} de unigramas para todos os atributos de interação, com exceção apenas das menções. Os autores acreditam que isso indica que as similaridades capturam crenças latentes de um usuário, afetadas pela homofilia e pela influência de outros usuários. Além disso, a técnica de cálculo de similaridades também ameniza a esparsidade da matriz de unigramas gerados a partir do conjunto de dados, um problema comum em estudos que utilizam dados textuais para treinar classificadores. 
+
+Uma abordagem análoga à de cálculo de similaridade entre usuários foi a utilizada no modelo proposto em \citeonline{feaster2017}. Os autores utilizam a análise de fatores múltiplos (MFA) e agrupamento hierárquico para agrupar os usuários com base em diferentes atributos demográficos, de conexão e de interação e, em seguida, identificar padrões de {\em hashtags} que se repetem em cada grupo. Para distinguir as {\em hashtags} associadas a cada um dos dois grupos analisados, apoiadores de Hillary Clinton e Donald Trump, os autores criaram um escore baseado na contagem de vezes que os usuários de cada grupo utilizaram cada {\em hashtag}, e na contagem de usuários de cada grupo que já haviam utilizado cada {\em hashtag}. Com isso, os autores puderam identificar {\em hashtags} exclusivas para cada grupo de apoiadores, e treinar um classificador baseado em {\em Random Forest} para detectar o posicionamento político dos usuários com base nas {\em hashtags} usadas em seus {\em tweets}. Apesar de o foco do trabalho ter sido em identificar {\em bots}, uma conclusão importante do trabalho para detecção de posicionamentos foi a de que grupos com posicionamentos diferentes tendem a usar algumas {\em hashtags} exclusivas de apoiadores, o que indica que as {\em hashtags} podem ser úteis para a tarefa em contextos políticos altamente polarizados, como em eleições.
+
+O estudo em \citeonline{mohand2018} propõe um modelo semi-supervisionado que detecta comunidades baseadas na similaridade de usuários em relação a {\em retweets}, menções, amigos, seguidores, {\em hashtags} e URLs, e as comunidades são rotuladas a partir de usuários com posicionamento conhecido. Os experimentos mostram que as proximidades contribuem de forma complementar para a performance do modelo, e portanto utilizá-las em conjunto gera resultados melhores que o uso das proximidades isoladas. Os atributos de amigos e {\em retweets} tiveram destaque, já que, segundo a homofilia, usuários dão preferência para interagir com outros usuários que compartilham da mesma opinião sobre assuntos polêmicos.
+
+O modelo de \citeonline{ku2018} trabalha com a rede de preferência, em uma abordagem baseada em {\em Markov Random Fields} (MRF), e modela tanto a noção de {\em posts} do Facebook quanto usuários. Os vértices do MRF são os usuários e os {\em posts}, e cada um deles possui um posicionamento, que é o estado oculto do MRF. Os usuários podem criar um {\em post} ou marcá-lo como favorito, e cada interação é uma aresta direcionada no grafo, o estado observado do MRF. A partir dos exemplos rotulados, o posicionamento de {\em posts} e de usuários são iterativamente atualizados para maximizar a probabilidade condicional das classes dado os atributos, até atingir a convergência. Os resultados indicam que a abordagem que une o conteúdo do {\em post} às interações entre os usuários supera tanto o modelo que usa apenas o conteúdo quanto o que utiliza apenas as interações.
+
+As redes de interação e conexão são exploradas ainda mais a fundo no trabalho de \citeonline{paolo2019}, que aborda o problema de detecção de posicionamento por usuário. Primeiro, os autores criam uma implementação baseada na técnica de {\em Bag-of-Words}, ou seja, um vetor binário para cada usuário do córpus, para representar de forma relacional os atributos de {\em hashtags}, menções e respostas. Além disso, criaram também a versão {\em plus} destas representações, em que as {\em hashtags} ou menções são tokenizadas. Os experimentos mostraram que a combinação do {\em Bag-of-Hashtags-plus}, {\em Bag-of-Mentions-plus} e {\em Bag-of-Hashtags-for-Replies} atingiram o melhor resultado. Apontam, ainda, que remover o atributo aparentemente redundante {\em Bag-of-Hashtags-for-Replies} diminui o F1 {\em score} do modelo em aproximadamente sete pontos percentuais. Além disso, o trabalho de \citeonline{paolo2019} analisa a interação entre usuários nas redes de seguidores, {\em retweets} e respostas, e demonstra que cada tipo de rede apresenta um grau diferente de homofilia. Os autores observam que, enquanto a grande maioria dos usuários apenas segue ou interage diretamente através de {\em retweets} com os usuários com quem compartilham do mesmo posicionamento, as interações de resposta são mais diversas, podendo apresentar até mesmo uma homofilia invertida. A conclusão foi a de que usuários tendem a se organizar dentro de comunidades homogêneas, exceto com relação às redes de respostas.
+
+Em \citeonline{andrew2019}, os autores abordam um problema ainda mais extremo, e se propõem a classificar os {\em tweets} sem utilizar o texto, e sim apenas atributos demográficos, de emoção/cognição e comportamentais, explorando diversas tarefas de classificação textual para além do texto. Tanto os atributos demográficos (idade e gênero) quanto de emoção/cognição (personalidade e ideologia política) foram extraídos a partir do texto utilizando modelos pré-treinados. Já o atributo comportamental utilizado foi a lista de amigos do usuário (ou {\em Followees}, na nomenclatura antiga). Os resultados mostram que o poder preditivo destes atributos, em especial do atributo comportamental, alcançam e até mesmo superam os classificadores puramente textuais. Dessa forma, os autores mostram que, em tarefas cujas classes são mais estáveis ao longo do tempo, como na detecção de posicionamentos, atributos comportamentais podem apresentar um resultado melhor na classificação do que o texto completo.
+
+Um problema similar é tratado em \citeonline{walid2019}, em que os autores se propõem a detectar o posicionamento de usuários ``silenciosos'', ou seja, que não necessariamente escrevem {\em tweets} relacionados ao alvo do posicionamento, mas se relacionam de outras formas com contas que o fazem, através de redes de interação, conexão ou preferência. São treinados quatro classificadores baseados em {\em Support Vector Machines} (SVM), um para cada atributo comportamental e outro para os dados textuais, além de um modelo que combina os quatro atributos. Os resultados apontam que todos os modelos treinados com atributos comportamentais de forma independente superaram o modelo exclusivamente textual, em especial a rede de interação e de preferência. O modelo que uniu os quatro atributos obteve o melhor resultado, e com maior significância estatística. Os autores concluem que é possível classificar o posicionamento de um usuário mesmo sem utilizar textos escritos por ele a respeito do alvo, e sim apenas utilizando suas interações com outros usuários nas redes sociais.
+
+O trabalho de \citeonline{paolo_multi2020} aborda o problema de detecção de posicionamentos em diferentes idiomas, e utiliza atributos comportamentais representados tanto de forma relacional ({\em bag-of-mentions} e comunidades baseadas em seguidores e {\em retweets}) quanto na forma de contagens (menções). Além disso, utiliza também atributos textuais (modelos de palavras, estruturais e sintáticos e sentimento do texto). Os resultados mostram que os melhores modelos utilizavam apenas os atributos textuais, a não ser para o córpus em italiano, em que o atributo de comunidades obteve a melhor performance. 
+
+Já o modelo proposto em \citeonline{paolo_brexit2020} utiliza atributos textuais estruturais ({\em bag-of-words} do texto dos {\em tweets} e {\em hashtags}), em conjunto com dicionários de sentimento e atributos comportamentais (menções e seguidores). Ambos os atributos comportamentais são representados de forma relacional. As menções são representadas em um {\em bag-of-mentions}, e o grafo de seguidores é utilizado para extrair comunidades, que são utilizadas para treinar o classificador final. Apesar de as comunidades resultantes não serem homogêneas quanto ao posicionamento, este atributo foi o que garantiu os melhores resultados.
+
+O modelo proposto em \citeonline{tanmoy2022} se baseou no fenômeno da homofilia (cf. seção \ref{sec:definicoes}), ao utilizar o posicionamento dos amigos de um usuário como atributo para a detecção do posicionamento deste usuário, em uma espécie de voto majoritário. O método consiste em treinar dois classificadores textuais neurais. O primeiro é baseado na arquitetura CNN, e o segundo, na arquitetura BiLSTM. O primeiro é treinado com os {\em tweets} do usuário, além de um {\em embedding} de {\em hashtags}, e o outro com os {\em tweets} dos amigos deste usuário. A classe prevista pelo segundo classificador é utilizada, então, como atributo para a previsão do primeiro. Dessa forma, o posicionamento dos amigos de um usuário influencia na previsão do posicionamento deste usuário. Os autores observam que a influência dos atributos comportamentais é maior nos resultados de conjuntos de dados cujo texto é altamente ruidoso, reforçando a importância dos atributos comportamentais para a detecção de posicionamentos.
+
+O trabalho de \citeonline{lucie2022} vai além da hipótese da homofilia ao explorar o fenômeno das ``câmaras de eco'' (ou {\em echo chambers}) que se formam nas redes sociais, conforme explicado na seção \ref{sec:definicoes}. O modelo proposto explorou especificamente as câmaras de eco formadas em redes de respostas, e sua correlação com atributos sociodemográficos, como idade, gênero e ideologia política. Primeiro, é aplicado um algoritmo de detecção de comunidades na rede de respostas e, em seguida, são criados classificadores textuais para detectar o posicionamento e os atributos demográficos dentro de cada comunidade. Os autores descobriram que comunidades mais propensas a formar câmaras de eco são também as mais polarizadas, e são as que dividem o público em perfis sociodemográficos mais distintos. Isso reforça a ideia de que incorporar informações sociodemográficas nas redes de interação é benéfico para distinguir diferentes posicionamentos, principalmente para alvos muito polarizados.
+
+
+\section{Considerações finais}
+
+Este capítulo apresentou um levantamento dos estudos da área de detecção de posicionamentos com atributos comportamentais por meio de uma revisão sistemática da literatura. O levantamento nos permitiu identificar os tipos de atributos empregados nesta tarefa, os métodos de combinação entre atributos textuais e comportamentais e os idiomas para os quais estes modelos foram desenvolvidos. 
+
+Dentre os trabalhos analisados neste capítulo, inúmeros exemplos mostram como utilizar exclusivamente atributos textuais pode limitar os modelos de detecção de posicionamentos em redes sociais \cite{hu2021, li2021, espinosa2020deepreading, yuan2017, tanmoy2022, tahar2017, lucie2022, andrew2019, walid2019, ku2018, paolo2019}. Apesar do potencial apresentado pelo uso desses atributos, no entanto, a área de detecção de posicionamentos com dados comportamentais ainda é pouco explorada, visto que apenas 40 trabalhos se encaixam nesta categoria.
+
+Dentre os 25 artigos explorados mais profundamente na seção \ref{sec:visao-detalhada}, doze utilizaram representações atômicas de atributos comportamentais que, na maioria dos casos, exerceram influência mínima ou negativa nos resultados \cite{kentaro2016, daniel2017, paolo2017, olga2017, ayaz2021, xia2019, singh2018, li2021}. Enquanto isso, treze estudos utilizaram representações relacionais de atributos comportamentais, e na maioria dos casos a adição desses atributos foi essencial para a performance do modelo \cite{espinosa2020deepreading, yuan2017, tanmoy2022, tahar2017, mohand2018, andrew2019, walid2019, ku2018, paolo2019, paolo_brexit2020}. Isso aponta que representações muito simples de atributos comportamentais podem não extrair todo o seu potencial para a detecção de posicionamentos, o que só pode ser feito através de um processamento mais sofisticado com representações estruturais. 
+
+Em relação aos atributos textuais, o uso de modelos de palavras é popular, mas apenas dois trabalhos da Revisão Sistemática utilizam modelos baseados na arquitetura {\em Bidirecional Encoder Representations from Transformers} (BERT) \cite{carolina2020, stefan2022}. Fora isso, o método mais comum de combinação dos atributos é a concatenação em vetor único, e o voto majoritário foi pouco explorado, em apenas um \cite{tanmoy2022}.
+
+Em relação ao idioma dos córpus, 35 dos 40 estudos utilizam córpus em inglês, enquanto apenas dois exploram o problema em português. Ademais, a maioria dos estudos utiliza córpus de menor porte, o que evidencia a necessidade de explorar córpus de maior porte na Língua Portuguesa, que ainda é pouco utilizada na área.
+
+Com base nesse levantamento, o estudo de \citeonline{espinosa2020deepreading} foi identificado como o mais próximo dos objetivos da pesquisa a ser desenvolvida neste trabalho, e será discutido em mais detalhes nos experimentos práticos detalhados no capítulo 4, e também contemplado na proposta de pesquisa a ser apresentada no capítulo 5.
+
+
+\chapter{Estudo piloto}
+\label{sec:experimentos}
+
+Neste capítulo serão apresentados três experimentos simples de detecção de posicionamentos a partir dos dados textuais e comportamentais tomando por base o córpus UstanceBR \cite{ustancebr}, descrito na seção \ref{sec:corpus}. A primeira seção descreve um experimento simples, utilizando apenas atributos comportamentais. Já a segunda seção detalha como os modelos treinados no primeiro experimento foram utilizados para avaliar o poder preditivo de diferentes combinações de atributos textuais e comportamentais. Por fim, a última seção aplica o método desenvolvido em \citeonline{espinosa2020deepreading} ao córpus UstanceBR. Os dois primeiros experimentos foram previamente publicados em \citeonline{ranlp-lais}.
+
+\section{Detecção de posicionamentos com atributos comportamentais}
+\label{sec:deteccao-atributos-comportamentais}
+
+Foi conduzido um experimento com o objetivo de comparar o poder preditivo de diferentes atributos comportamentais para a detecção de posicionamentos, explorando técnicas simples de pré-processamento e utilizando cada atributo de forma independente. Os atributos considerados incluem a lista de amigos do usuário, a lista de seguidores do usuário e a lista de menções feitas pelo usuário. Dessa forma, este experimento busca responder à seguinte questão:
+
+\begin{itemize}
+    \item [Q1.] Qual atributo comportamental demonstrou ter o maior poder preditivo para detectar o posicionamento de cada alvo do córpus?
+\end{itemize}
+
+A fim de responder a esta questão, foram implementados três classificadores binários de regressão logística, cada um correspondendo a um atributo comportamental específico. Os detalhes de otimização e treino dos modelos serão apresentados nas próximas seções.
+
+A partir das listas de símbolos representando usuários, foram extraídas caracterísicas na forma de vetores do tipo {\em Bag-of-Users} \cite{bagofusers}. Nesta representação, cada atributo comportamental foi codificado como uma lista de {\em strings} por usuário. Dessa forma, cada lista foi transformada em um único texto através da concatenação de {\em strings}, e transformadas numa matriz {\em Bag-of-Users}. A figura \ref{fig:bagoffriends} exemplifica este processo para o atributo de amizade, em forma de diagrama, e cria um {\em Bag-of-Friends}.
+
+\begin{figure}[H]
+	\centering
+ 	  \caption{Diagrama da representação {\em Bag-of-Users} para o atributo de amizade ({\em Bag-of-Friends})}
+	\includegraphics[width=0.6\textwidth]{imagens/bagoffriends.jpg}
+	\label{fig:bagoffriends}
+  \source{Laís Cavalheiro, 2024}
+\end{figure}
+
+Após aplicar esse processo para todas as instâncias do conjunto de dados, foi possível criar um {\em Bag-of-Friends}, {\em Bag-of-Mentions} e {\em Bag-of-Followers} para cada alvo. A interpretação desta representação é análoga à da técnica do {\em Bag-of-Words}, tradicionalmente aplicada a modelos textuais. Cada coluna em um {\em Bag-of-Followers}, por exemplo, mostra, para cada {\em tweet} do córpus, se o usuário da coluna segue o usuário que postou aquele {\em tweet}. 
+
+Além disso, foi aplicada também nesta representação a transformação {\em Tf-Idf}, para que fosse atribuída uma importância maior a características mais discriminativas. Por fim, para mitigar a esparsidade do conjunto de treino, um problema comum ao utilizar o {\em Bag-of-Words}, a dimensionalidade foi reduzida utilizando a técnica de seleção de atributos com o módulo \texttt{SelectKBest} da biblioteca \texttt{sklearn}, com \texttt{k = 20.000}.
+
+\subsection{Dados}
+\label{sec:dados}
+O córpus utilizado para o experimento foi o UstanceBR, o qual foi previamente detalhado na seção \ref{sec:ustancebr}. Como mencionado anteriormente, trata-se de um córpus binário, e suas instâncias podem ser classificadas como contrárias ou favoráveis ao alvo. Devido à segmentação do córpus em seis alvos, os três classificadores propostos foram implementados para cada um deles, totalizando 18 modelos. Foram utilizados os conjuntos de treino e teste padrão do córpus, e 20\% do conjunto de treino foi separado para validação.
+
+\subsection{Procedimento}
+\label{sec:procedimento}
+O modelo de regressão logística foi implementado em Python, utilizando a biblioteca \texttt{sklearn}. Os valores de \texttt{class\_weight=`balanced', solver=`liblinear', max\_iter=500} foram fixados para o treino de todos os modelos. Já os hiperparâmetros \texttt{C}, \texttt{tol} e \texttt{penalty} foram otimizados com o auxílio de uma busca em grade, implementada com a classe \texttt{GridSearchCV} da mesma biblioteca. A métrica considerada para avaliar a qualidade dos modelos foi a média macro do F1 {\em score}, e os valores considerados para cada hiperparâmetro estão indicados na tabela \ref{tab:GridSearch}. Os hiperparâmetros que não foram citados utilizaram os valores padrão da biblioteca.
+
+\begin{table}[ht]
+\centering
+\caption{Valores considerados para cada hiperparâmetros na busca em grade}
+\begin{tabular}{ll}
+\hline
+Hiperparâmetro & Valores considerados \\
+\hline
+C & 0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9 \\
+Tol & 0.01, 0.001, 0.0001, 0.00001 \\
+Penalty & l2, l1 \\
+\hline
+\end{tabular}
+\label{tab:GridSearch}
+\source{Laís Cavalheiro, 2024}
+\end{table}
+
+Os hiperparâmetros resultantes da aplicação do \texttt{GridSearchCV} para os modelos de {\em Bag-of-Friends}, {\em Bag-of-Followers} e {\em Bag-of-Mentions} são apresentados na tabela \ref{tab:hiperparametros-modelos-finais}.
+
+\begin{table}[ht]
+\centering
+\caption{Hiperparâmetros dos modelos finais}
+\label{tab:hiperparametros-modelos-finais}
+\begin{tabular}{ llllllc }
+\hline
+Modelo & Alvo & Penalty & Tol & C \\
+\hline
+\multirow{6}{*}{Bag-of-Friends} & Lula & l1 & 1,00E-03 & 1,9 \\
+& Bolsonaro & l1 & 1,00E-03 & 1,3 \\
+& Cloroquina & l2 & 1,00E-03 & 1,9 \\
+& Sinovac & l1 & 1,00E-02 & 1,9 \\
+& TV Globo & l1 & 1,00E-02 & 1,9 \\
+& Igreja & l2 & 1,00E-02 & 1,9 \\
+\hline
+\multirow{6}{*}{Bag-of-Followers} & Lula & l1 & 1,00E-02 & 1,9 \\
+& Bolsonaro & l1 & 1,00E-04 & 1,3 \\
+& Cloroquina & l2 & 1,00E-02 & 1,9 \\
+& Sinovac & l2 & 1,00E-02 & 1,9 \\
+& TV Globo & l2 & 1,00E-03 & 0,1 \\
+& Igreja & l2 & 1,00E-03 & 1,9 \\
+\hline
+\multirow{6}{*}{Bag-of-Mentions} & Lula & l2 & 1,00E-04 & 1,9 \\
+& Bolsonaro & l2 & 1,00E-02 & 1,5 \\
+& Cloroquina & l2 & 1,00E-03 & 1,9 \\
+& Sinovac & l2 & 1,00E-02 & 1,9 \\
+& TV Globo & l2 & 1,00E-03 & 1,9 \\
+& Igreja & l2 & 1,00E-02 & 1,9 \\
+\hline
+\end{tabular}
+\source{Laís Cavalheiro, 2024}
+\end{table}
+
+Os 18 classificadores foram treinados no conjunto de dados de treino, e otimizados com base nos hiperparâmetros mencionados na tabela \ref{tab:hiperparametros-modelos-finais}.
+
+\subsection{Resultados}
+A tabela \ref{tab:f1-macro-avg} resume os resultados no conjunto deteste de cada modelo, para todos os alvos e atributos comportamentais, incluindo o {\em baseline} de classe majoritária (CM). A métrica utilizada para determinar o melhor modelo foi a média macro do F1 {\em score}, e os melhores resultados para cada alvo foram marcados em negrito.
+
+\begin{table}[ht]
+\centering
+\caption{Resultados da regressão logística com atributos comportamentais}
+\label{tab:f1-macro-avg}
+\begin{tabular}{ lllll }
+\hline
+Alvo & Modelo & F1 & CM \\
+\hline
+\multirow{3}{*}{Lula} & Bag-of-Friends & \textbf{0,91} & 0,54 \\
+& Bag-of-Followers & 0,88 & 0,54 \\
+& Bag-of-Mentions & 0,90 & 0,54 \\ \hline
+\multirow{3}{*}{Bolsonaro} & Bag-of-Friends & 0,94 & 0,59 \\
+& Bag-of-Followers & 0,93 & 0,59 \\
+& Bag-of-Mentions & \textbf{0,95} & 0,59 \\ \hline
+\multirow{3}{*}{Cloroquina} & Bag-of-Friends & 0,88 & 0,50 \\
+& Bag-of-Followers & 0,85 & 0,50 \\
+& Bag-of-Mentions & \textbf{0,93} & 0,50 \\ \hline
+\multirow{3}{*}{Sinovac} & Bag-of-Friends & 0,84 & 0,50 \\
+& Bag-of-Followers & 0,79 & 0,50 \\
+& Bag-of-Mentions & \textbf{0,90} & 0,50 \\ \hline
+\multirow{3}{*}{TV Globo} & Bag-of-Friends & 0,72 & 0,55 \\
+& Bag-of-Followers & 0,67 & 0,55 \\
+& Bag-of-Mentions & \textbf{0,75} & 0,55 \\ \hline
+\multirow{3}{*}{Igreja} & Bag-of-Friends & 0,75 & 0,50 \\
+& Bag-of-Followers & 0,51 & 0,50 \\
+& Bag-of-Mentions & \textbf{0,78} & 0,50 \\ \hline
+\end{tabular}
+\source{Laís Cavalheiro, 2024 adaptado de \citeonline{ranlp-lais}}
+\end{table}
+
+A tabela \ref{tab:f1-macro-avg} mostra que, para a maioria dos alvos, o melhor modelo foi o de {\em Bag-of-Mentions}, com exceção do alvo Lula, em que o {\em Bag-of-Friends} superou seu resultado. Dessa forma, respondendo à questão de pesquisa ``{\em Q1. Qual atributo comportamental demonstrou ter o maior poder preditivo para detectar o posicionamento de cada alvo do córpus?}'', pode-se concluir que o atributo de menções se destacou em relação aos demais, já que a medida F1 de seu modelo superou o dos outros modelos de forma consistente entre os alvos do córpus. Este resultado fortalece a hipótese de que atributos comportamentais desempenham um papel significativo na detecção de posicionamentos de usuários em redes sociais, mesmo quando não é utilizado o texto dos {\em tweets} que expressam esses posicionamentos \cite{tahar2017, espinosa2020deepreading, isisisnotislam, andrew2019}. 
+ 
+\section{Detecção de posicionamentos com atributos textuais e comportamentais}
+\label{sec:deteccao-atributos-textuais-e-comportamentais}
+
+O segundo experimento realizado teve como objetivo comparar o potencial preditivo de diferentes combinações entre atributos comportamentais e textuais, utilizando a mesma metodologia do experimento anterior. Foram utilizados os atributos comportamentais de lista de amigos do usuário, lista de seguidores do usuário e lista de menções feitas pelo usuário. O atributo textual considerado foi o texto do {\em tweet} com o posicionamento do usuário. Este experimento procura responder, então, à seguinte questão:
+
+\begin{itemize}
+    \item [Q2.] Qual combinação de atributos textuais e comportamentais demonstrou maior poder preditivo para detectar o posicionamento de cada alvo do córpus?
+\end{itemize}
+
+A fim de responder a esta questão, o experimento consistiu em classificar {\em tweets} utilizando combinações de atributos comportamentais e textuais. Foram consideradas duas classes, contra e a favor, sem uma classe neutra.
+
+Ao invés de treinar e otimizar um novo modelo para cada combinação de atributos, optou-se por reutilizar os modelos desenvolvidos no experimento anterior, já que cada um correspondia a um atributo comportamental específico. Dessa forma, o detalhamento sobre os dados e o procedimento utilizados para este experimento podem ser encontrados nas seções \ref{sec:dados} e \ref{sec:procedimento}, respectivamente. No que diz respeito ao atributo textual, foi necessário utilizar um modelo treinado com o texto dos {\em tweets} do córpus UstanceBR. Por isso, foi escolhido o modelo de classificação textual baseado em BERT desenvolvido em \citeonline{pavan2022}.
+
+Os modelos foram combinados em grupos de dois e três, além da combinação de todos os quatro modelos. O nome de cada modelo foi codificado da seguinte forma:
+\begin{itemize}
+    \item {\em tx} representa o modelo textual;
+    \item {\em fr} representa o modelo {\em Bag-of-Friends};
+    \item {\em fo} representa o modelo {\em Bag-of-Followers};
+    \item e {\em me} representa o modelo {\em Bag-of-Mentions}.
+\end{itemize}
+Um exemplo de nomenclatura nesta codificação é o modelo {\em tx\_fr\_fo\_me}, que une todos os modelos descritos acima.
+
+A abordagem escolhida para unir o resultado de classificação dos modelos foi a de Voto Majoritário. A partir das previsões de cada modelo, a previsão final foi selecionada da seguinte forma:
+\begin{itemize}
+    \item Se a metade dos classificadores mais um classificou um exemplo como a favor, então o resultado final será a favor.
+    \item Se a metade mais um classificou como contra, o resultado final será contra.
+    \item Se metade classificou como a favor e a outra metade classificou como contra, o resultado é escolhido aleatoriamente.
+\end{itemize}
+
+\subsection{Resultados}
+A tabela \ref{tab:f1-macro-avg-voto-majoritario} mostra a média macro do F1 {\em score} de todas as combinações, além da mesma métrica para a classe majoritária. Os melhores resultados para cada alvo estão em negrito.
+
+\begin{table}[ht]
+\centering
+\caption{Resultados do voto majoritário para diferentes combinações de atributos}
+\label{tab:f1-macro-avg-voto-majoritario}
+\begin{tabular}{ lllllll }
+\hline
+Modelo & Lula & Bolsonaro & Cloroquina & Sinovac & TV Globo & Igreja \\
+\hline
+tx\_fr & 0,88 & 0,91 & 0,86 & 0,86 & 0,81 & 0,82 \\
+tx\_fo & 0,85 & 0,90 & 0,85 & 0,82 & 0,79 & 0,70 \\
+tx\_me & 0,87 & 0,91 & 0,89 & 0,87 & \textbf{0,82} & 0,83 \\
+fr\_fo & 0,90 & 0,93 & 0,86 & 0,81 & 0,69 & 0,68 \\
+fr\_me & 0,90 & 0,95 & 0,90 & 0,87 & 0,75 & 0,78 \\
+fo\_me & 0,89 & 0,94 & 0,89 & 0,85 & 0,72 & 0,68 \\
+tx\_fr\_fo & 0,91 & 0,94 & 0,88 & 0,84 & 0,75 & \textbf{0,86} \\
+tx\_fr\_me & \textbf{0,92} & \textbf{0,96} & \textbf{0,94} & \textbf{0,92} & 0,79 & 0,83 \\
+tx\_fo\_me & \textbf{0,92} & 0,95 & 0,93 & 0,90 & 0,79 & 0,85 \\
+fr\_fo\_me & 0,91 & 0,94 & 0,87 & 0,83 & 0,73 & 0,81 \\
+tx\_fr\_fo\_me & 0,91 & 0,95 & 0,90 & 0,87 & 0,77 & 0,84 \\
+\hline
+CM & 0,54 & 0,59 & 0,50 & 0,50 & 0,55 & 0,50 \\
+\hline
+\end{tabular}
+\source{Laís Cavalheiro, 2024 adaptado de \citeonline{ranlp-lais}}
+\end{table}
+
+A tabela \ref{tab:f1-macro-avg-voto-majoritario} mostra que se destaca o modelo que une texto, amigos e menções ({\em tx\_fr\_me}), já que ele apresentou o melhor resultado para quatro dos seis alvos. Esse resultado pode ser utilizado como resposta para a pergunta Q2, indicando que essa combinação possui o maior poder preditivo para o córpus em questão. Além disso, é válido observar que todos os modelos propostos tiveram F1 superior ao da classe majoritária.
+
+A partir destes resultados, aplicou-se o teste de McNemar \cite{mcnemar} para validar a significância estatística dos resultados obtidos. Para tanto, tornou-se necessário selecionar um modelo que servisse como referência, denominado aqui de ``modelo proposto''. Dado que o modelo de {\em tx\_fr\_me} apresentou o melhor resultado para a maioria dos alvos, ele foi escolhido como o modelo proposto, a ser comparado com o segundo melhor modelo no teste.
+
+É importante mencionar que a escolha do segundo melhor modelo foi baseada no F1 {\em score} do modelo proposto. Portanto, mesmo que existam modelos superiores para os alvos de TV Globo e Igreja, o modelo escolhido foi o segundo melhor abaixo do modelo de {\em tx\_fr\_me}.
+
+Os resultados deste teste estão presentes na tabela \ref{tab:mc-nemar}. Esta tabela traz o alvo, a estatística $\chi^2$ e o $p-value$ para cada teste, o segundo melhor modelo e o resultado do teste para cada alvo. O modelo proposto foi omitido por ser o mesmo para todos os alvos.
+
+\begin{table}[ht]
+\centering
+\caption{Diferenças entre o modelo {\em tx\_fr\_me} e os melhores para cada alvo segundo o teste de McNemar}
+\label{tab:mc-nemar}
+\begin{tabular}{ lllllll }
+\hline
+Alvo & Modelo & F1 & $\chi^2$ & $p$ & Significância \\ \hline
+Lula & fr\_fo\_me & 0,91 & 9,806 & $p < 0,01$ & Sim \\
+Bolsonaro & tx\_fo\_me & 0,95 & 3,000 & $p < 0,05$ & Sim \\
+Cloroquina & tx\_fo\_me & 0,93 & 8,000 & $p < 0,05$ & Sim \\
+Sinovac & tx\_fo\_me & 0,90 & 4,000 & $p < 0,001$ & Sim \\
+TV Globo & tx\_fr\_fo\_me & 0,77 & 21,000 & $p < 0,001$ & Sim \\
+Igreja & tx\_fr & 0,82 & 1,773 & $p > 0,05$ & Não \\
+\hline
+\end{tabular}
+\source{Laís Cavalheiro, 2024 adaptado de \citeonline{ranlp-lais}}
+\end{table}
+
+Os resultados da tabela \ref{tab:mc-nemar} mostram que, para a maioria dos alvos, a diferença entre o resultado do modelo de {\em tx\_fr\_me} e o segundo melhor modelo foi estatisticamente significativa. Apenas para o tópico de Igreja, estes modelos se mostraram equivalentes.
+
+Este experimento mostra como a combinação entre diferentes atributos textuais e comportamentais tem o potencial de melhorar o resultado de classificadores de posicionamento em redes sociais. Além disso, apesar de os atributos baseados em menções e amigos não terem o melhor F1 {\em score} para todos os conjuntos de dados, os resultados mostram um grande potencial desses atributos. Também é válido notar que, contraintuitivamente, a combinação de todos os modelos não é a que produz os melhores resultados, o que evidencia a importância de testar diferentes combinações entre os atributos, visando encontrar uma combinação ótima.
+
+\section{Baseline de Detecção de Posicionamentos com atributos comportamentais}
+\label{sec:experimento-baseline}
+
+Para viabilizar futuras comparações entre o trabalho a ser desenvolvido e estudos existentes na área de detecção de posicionamentos com atributos comportamentais, foi realizada a implementação do modelo proposto em \citeonline{espinosa2020deepreading}, e a posterior adaptação ao córpus UstanceBR, detalhados na seção \ref{sec:classificacao}.
+No entanto, é válido salientar que o objetivo desta avaliação não foi o de superar os resultados deste modelo, mas sim apenas replicá-lo para futuro uso como {\em baseline} para nossos estudos baseados no idioma Português. A escolha do modelo proposto em \citeonline{espinosa2020deepreading} como {\em baseline} é motivada na seção \ref{sec:baseline}. Detalhes da implementação são  discutidos na seção \ref{sec:classificacao}, e os resultados são apresentados na seção \ref{sec:resultados-baseline}.
+
+\subsection{Seleção do modelo a ser adaptado}
+\label{sec:baseline}
+
+A identificação de um trabalho existente na literatura que fosse compatível com o presente estudo e, simultaneamente, representasse o estado-da-arte da área, é limitada quanto aos atributos disponíveis no córpus UstanceBR que é a base do presente estudo. Por exemplo, apesar de atributos como {\em retweets} e respostas serem amplamente utilizados na literatura, eles não estão contidos nesse córpus. Isso inviabiliza a replicação de estudos que os empregam sem adaptações, as quais poderiam descaracterizar os modelos escolhidos. Diante dessa limitação, a escolha de um {\em baseline} exigiu considerar tanto a definição do problema quanto as restrições do conjunto de dados. Vale notar que o enriquecimento do córpus UstanceBR com informações não coletadas originalmente, a partir de 2019, não é uma opção viável. Além de a API do {\em Twitter} ter passado por alterações significativas desde a construção da versão do córpus que será utilizada, muitos dos usuários analisados podem ter desativado suas contas, apagado postagens, e é muito provável que suas listas de amigos, seguidores e menções tenham sofrido alterações substanciais desde então.
+
+Nesse contexto, a escolha do {\em baseline} considerou os seguintes pontos:
+\begin{itemize}
+  \item O estudo deve abordar o problema de Classificação de Posicionamentos.
+  \item O alvo do conjunto de dados utilizado deve ser {\em target-based}, conforme explicado na seção \ref{sec:planejamento-conducao}.
+  \item Preferencialmente, o estudo deve utilizar apenas os atributos de amigos, seguidores, menções e outros atributos textuais, já que o córpus UstanceBR possui essa limitação de atributos.
+\end{itemize}
+
+A partir dos critérios citados acima, foram filtrados sete estudos, tanto da revisão sistemática quanto da revisão exploratória, apresentadas no capítulo \ref{sec:trabalhos-relacionados} . O modelo escolhido foi aquele proposto em \citeonline{espinosa2020deepreading}, descrito na seção \ref{sec:visao-detalhada}. Além de atender aos critérios estabelecidos, o modelo em questão foi o vencedor da competição EvalIta2020 SardiStance \cite{cignarella2020}, o que reforça sua escolha como {\em baseline} representativo do estado-da-arte.
+
+\subsection{Replicação do modelo de \citeonline{espinosa2020deepreading}}
+\label{sec:classificacao}
+
+Para implementar o modelo proposto em \citeonline{espinosa2020deepreading}, primeiramente foi utilizado o córpus SardiStance2020, descrito no capítulo 2, com o qual este modelo foi originalmente desenvolvido. O modelo foi replicado com as três classes presentes no córpus SardiStance2020 (a favor, contra e neutro). Em seguida, o método em questão foi adaptado ao cenário de classificação binária e aplicado ao córpus UstanceBR.
+
+Embora o córpus do SardiStance2020 guarde diversas semelhanças com o córpus UstanceBR, algumas adaptações foram necessárias para a replicação do modelo. Primeiramente, uma das classes de atributos utilizadas no modelo de \citeonline{espinosa2020deepreading} é a de atributos psicológicos extraídos pela API Symanto. Dado que este recurso não oferece uma API pública gratuita, não foi viável utilizá-la na replicação. Dessa forma, os atributos psicológicos não foram utilizados no treino dos modelos que serão discutidos a seguir. Além disso, uma vez que alguns detalhes de implementação foram omitidos no artigo de divulgação do modelo, pequenas discrepâncias na implementação podem ter impactado nos resultados.
+
+Os atributos utilizados para o desenvolvimento do modelo foram os seguintes:
+\begin{itemize}
+  \item Atributos emocionais: adaptação do dicionário {\em Affective Norms for English Words} (ANEW) para Italiano \cite{anew}.
+  \item Atributos do Twitter:
+  \begin{itemize}
+    \item contagem de {\em tweets};
+    \item contagem de seguidores;
+    \item contagem de seguidos;
+    \item e data de criação da conta.
+  \end{itemize}
+  \item Atributos de rede: a média de distância para usuários com posições contrárias (\texttt{dagainst}), a média de distância para usuários favoráveis (\texttt{dfavor}) e para usuários neutros (\texttt{dnone}).
+  \item Atributos textuais: modelos textuais UmBERTo, Italian BERT XXL e GilBERTo, baseados em BERT.
+\end{itemize}
+
+Para viabilizar a implementação do modelo vencedor proposto pelo artigo, foi necessário desenvolver quatro modelos distintos, pois o último deles utilizava os resultados dos três primeiros. O modelo 4 não foi implementado, pois sua estratégia para unir os resultados dos modelos foi inferior à do modelo 5. Os modelos implementados, originalmente propostos em \citeonline{espinosa2020deepreading}, foram os seguintes:
+
+\begin{itemize}
+  \item Modelo 1: atributos emocionais e do Twitter. O classificador é um XGBoost configurado para classificação multiclasse, levando em consideração os pesos das classes.
+  \item Modelo 2: atributos emocionais, do Twitter e atributos de rede. O classificador é o mesmo do Modelo 1.
+  \item Modelo 3: atributos emocionais, do Twitter, atributos de rede e probabilidades de cada classe (contra e a favor) previstas pelo modelo de linguagem UmBERTo. O classificador é o mesmo dos modelos 1 e 2.
+  \item Modelo 5: Este modelo une as predições dos modelos anteriores através de um voto majoritário ponderado, em que cada um dos sistemas considerados tem como peso o valor F1 obtido nos dados de desenvolvimento. Os sistemas considerados foram os modelos 1, 2 e 3, além das previsões dos modelos textuais UmBERTo, Italian BERT XXL e GilBERTo.
+\end{itemize}
+
+Após a reprodução dos modelos com o córpus SardiStance2020, o próximo passo foi adaptar o método para o córpus UstanceBR. Como o conjunto de dados originalmente utilizado no artigo possuía textos em italiano, foi necessário adaptar o processamento dos atributos textuais para português. 
+
+A primeira adaptação que precisou ser feita foi para os atributos emocionais. Ao invés de utilizar o dicionário ANEW adaptado para italiano, foi necessário trocá-lo pelo ANEW BR, a versão em porguês deste mesmo método, desenvolvida em \citeonline{kristensen2011normas}. Após esta adaptação, o único outro atributo textual dos modelos eram os modelos textuais baseados em BERT. Por isso, ao invés de testar diferentes modelos baseados em BERT para o português, utilizamos apenas o modelo BERTabaporu, desenvolvido em \citeonline{bertabaporu}.
+
+Os modelos treinados no córpus UstanceBR possuíam os seguintes atributos:
+
+\begin{itemize}
+  \item Modelo 1: atributos emocionais e atributos do Twitter.
+  \item Modelo 2: atributos emocionais, atributos do Twitter e atributos de rede para as classes a favor e contra.
+  \item Modelo 3: atributos emocionais, atributos do Twitter, atributos de rede para as classes a favor e contra, e a probabilidade de cada classe prevista pelo modelo BERTabaporu.
+  \item Modelo 5: união das predições dos modelos anteriores através de um voto majoritário ponderado, em que cada um dos sistemas considerados tem como peso o valor F1 obtido nos dados de desenvolvimento. Os sistemas considerados foram os modelos 1, 2 e 3, além das previsões do modelo BERTabaporu.
+\end{itemize}
+
+\subsection{Dados}
+Foram utilizados os córpus SardiStance2020 e UstanceBR, ambos detalhados no capítulo 2. Para os dois córpus, foram utilizados os seus conjuntos de treino e teste padrão, e 20\% das instâncias de cada conjunto de treino foram separadas para validação.
+
+\subsection{Procedimento}
+Para a implementação de todos os classificadores, foram utilizados os hiperparâmetros divulgados pelos autores no próprio estudo \cite{espinosa2020deepreading}.
+
+Primeiro, foram avaliados os modelos 1, 2, 3 e 5 treinados com exemplos das três classes (contra, a favor e neutro), para permitir uma comparação direta de resultados com o artigo original, e avaliar a magnitude do impacto das diferenças de implementação. Após o teste ternário, foram omitidos os exemplos da classe neutra no conjunto de treino e foram treinados os modelos 1, 2, 3 e 5 apenas com as classes contra e a favor. Apesar de os conjuntos de dados se tratarem de problemas diferentes e, portanto, não serem diretamente comparáveis, ter os resultados deste mesmo método para o mesmo número de classes em diferentes conjuntos de dados permite validar a qualidade do método utilizado em diferentes cenários.
+
+\subsection{Resultados}
+\label{sec:resultados-baseline}
+A tabela \ref{tab:desempenho-modelos} mostra os resultados dos classificadores ternários, acompanhados do resultado original em \citeonline{espinosa2020deepreading}. Estão grifados na tabela o melhor resultado no conjunto de teste, assim como o melhor resultado do artigo original.
+
+\begin{table}[ht]
+\centering
+\caption{Resultados dos modelos replicados para o SardiStance2020}
+\label{tab:desempenho-modelos}
+\begin{tabular}{ p{1in} p{1in} p{1in} p{1.5in} }
+\hline
+Modelo & Treino & Teste & \citeonline{espinosa2020deepreading}\\
+\hline
+UmBERTo & 0,61 & 0,63 & 0,65 \\
+Bert XXL & 0,60 & 0,62 & 0,66 \\
+GilBERTo & 0,56 & 0,60 & 0,62 \\
+Modelo 1 & 0,61 & 0,41 & 0,53 \\
+Modelo 2 & 1,00 & 0,66 & 0,69 \\
+Modelo 3 & 1,00 & \textbf{0,69} & 0,72 \\
+Modelo 5 & 0,40 & 0,68 & \textbf{0,74} \\ \hline
+\end{tabular}
+\source{Laís Cavalheiro, 2024}
+\end{table}
+
+Vemos que os resultados dos modelos textuais baseados em BERT são mais similares ao resultado do artigo original do que os modelos baseados em atributos. Isso era esperado, já que não utilizamos os atributos psicológicos que, como os resultados indicam, exercem influência significativa no resultado do modelo 1.
+
+A tabela \ref{tab:resultados-ustancebr-baseline} mostra o resultado dos classificadores treinados no córpus UstanceBR. Além disso, para fins ilustrativos, foram incluídos os resultados de dois outros classificadores. O {\em Bag-of-Mentions} foi o melhor classificador do experimento com atributos comportamentais descrito na seção \ref{sec:deteccao-atributos-comportamentais}, e {\em tx\_fr\_me} foi o melhor modelo do experimento com atributos textuais e comportamentais descrito na seção \ref{sec:deteccao-atributos-textuais-e-comportamentais}. A métrica escolhida foi o F1 {\em score}, e o melhor resultado para cada alvo está em negrito.
+
+\begin{table}[ht]
+    \centering
+    \caption{Resultado dos modelos aplicados para o UstanceBR}
+    \label{tab:resultados-ustancebr-baseline}
+    \begin{tabular}{ lllllll }
+        \hline
+        Modelo & Lula & Bolsonaro & Cloroquina & Sinovac & TV Globo & Igreja \\
+        \hline
+        BERTabaporu & 0,89 & 0,91 & 0,89 & 0,90 & \textbf{0,92} & 0,90 \\
+        Modelo 1 & \textbf{0,93} & \textbf{0,96} & 0,67 & 0,73 & 0,67 & 0,75 \\
+        Modelo 2 & 0,65 & 0,86 & 0,55 & 0,69 & 0,59 & 0,60 \\
+        Modelo 3 & 0,89 & 0,92 & 0,89 & 0,90 & 0,90 & 0,90 \\
+        Modelo 5 & 0,90 & 0,91 & 0,90 & 0,90 & \textbf{0,92} & \textbf{0,91} \\
+        Bag-of-Mentions & 0,90 & 0,95 & 0,93 & 0,90 & 0,75 & 0,78 \\
+        tx\_fr\_me & 0,92 & \textbf{0,96} & \textbf{0,94} & \textbf{0,92} & 0,79 & 0,83 \\
+        \hline
+    \end{tabular}
+    \source{Laís Cavalheiro, 2024}
+\end{table}
+
+É possível observar na tabela \ref{tab:resultados-ustancebr-baseline} que, dentre os modelos de {\em baseline} replicados, o modelo 5 obteve, no geral, os melhores resultados. No entanto, é interessante notar que para os alvos Lula e Bolsonaro, o melhor classificador dentre todos os experimentos foi o modelo 1, que combina atributos emocionais e atributos do Twitter. Por outro lado, para os alvos Cloroquina e Sinovac, o melhor classificador foi o {\em tx\_fr\_me}, que combina texto, amigos e menções. O modelo 2, que adiciona ao modelo 1 os atributos de rede, obteve os piores resultados.
+
+
+\section{Considerações finais}
+
+Neste capítulo, foram apresentados três experimentos de caráter exploratório com o objetivo de construir uma infraestrutura computacional básica para experimentação de modelos de detecção de posicionamentos com base em dados textuais e comportamentais. Além dos experimentos já publicados em \cite{ranlp-lais}, foi conduzida adaptação da abordagem vencedora da competição EvalIta2020 SardiStance \cite{cignarella2020}, o modelo desenvolvido em \citeonline{espinosa2020deepreading}, para o português, com resultados compatíveis ao original italiano.
+
+\chapter{Proposta de pesquisa}
+\label{sec:proposta}
+
+A maioria dos estudos analisados no capítulo \ref{sec:trabalhos-relacionados} propõem métodos supervisionados para a tarefa de detecção de posicionamentos. Além disso, todos os classificadores propostos nesses estudos são {\em in-domain}, ou seja, treinados e testados com dados relacionados a um mesmo alvo de posicionamento. Ao mesmo tempo, é possível observar na literatura a prevalência de córpus de pequeno porte, cujo número reduzido de instâncias pode prejudicar o treino de classificadores {\em in-domain}. 
+
+Uma tendência na área de detecção de posicionamentos são os modelos {\em zero-shot}, ou seja, classificadores {\em out-of-domain}. Por serem treinados e testados com dados relacionados a alvos de posicionamento distintos, também são chamados de classificadores {\em cross-target} \cite{condgen, pavan2022}. No entanto, até o momento, a maioria dos trabalhos {\em zero-shot} na literatura de detecção de posicionamentos utilizam apenas dados textuais para o treino dos modelos, e não exploram atributos comportamentais \cite{vast, toad, bicond, crossnet, ckenet}. 
+
+Uma exceção é o modelo proposto em \citeonline{isisisnotislam}, encontrado na revisão exploratória. Nesse estudo, os autores coletam dados sobre um evento polêmico, e seu objetivo é determinar se é possível detectar o posicionamento dos usuários antes de este evento ter acontecido. Dessa forma, o modelo é treinado com dados não relacionados a este evento, ou seja, dados {\em out-of-domain} e potencialmente {\em out-of-task}, já que não foi realizado um filtro de {\em tweets} que expressavam posicionamentos. Apesar de não citar o termo {\em zero-shot}, o estudo propõe classificadores ood, e explora tanto dados textuais quanto atributos comportamentais. Os resultados indicam que os atributos comportamentais se destacam em relação aos textuais. Não foi encontrado nenhum estudo de detecção de posicionamentos na modalidade {\em zero-shot} que explora o poder preditivo de apenas atributos comportamentais.
+
+O estudo piloto apresentado no capítulo \ref{sec:experimentos} destaca o papel dos atributos comportamentais na tarefa em questão. Os resultados do experimento descrito na seção \ref{sec:deteccao-atributos-comportamentais} evidenciam que, mesmo quando não são combinados com dados textuais, esses atributos possuem poder preditivo significativo. Isso reforça evidências da literatura de que é possível criar um modelo de detecção de posicionamentos que não utiliza dados textuais, apenas atributos comportamentais, que supera modelos puramente textuais \cite{andrew2019}.
+
+As observações acima nos levam às seguintes questões de pesquisa:
+\begin{enumerate}
+    \item[QP1.] Quais são os melhores classificadores {\em in-domain} para a tarefa de detecção de posicionamentos com atributos textuais e comportamentais?
+    \item[QP2.] Quais atributos demostraram o maior poder preditivo para esta tarefa?
+    \item[QP3.] Como esses atributos podem ser combinados de forma ótima?
+    \item[QP4.] Quais são os melhores classificadores {\em zero-shot} para a tarefa de detecção de posicionamentos que utilizem apenas atributos comportamentais?
+\end{enumerate}
+
+O objetivo deste trabalho é desenvolver um classificador {\em zero-shot} capaz de detectar posicionamentos de usuários de redes sociais utilizando apenas atributos comportamentais, de modo a obter o desempenho mais próximo possível ao de classificadores {\em in-domain}.
+
+\subsection{Metodologia}
+
+O córpus UstanceBR, como visto na seção \ref{sec:ustancebr}, possui exemplos de seis tópicos diferentes, ao contrário do córpus SardiStance2020, que possui exemplos de apenas um tópico (cf. seção \ref{sec:sardistance}). Dessa forma, dentre os conjuntos de dados considerados, o córpus UstanceBR é o único que possibilitaria a aplicação de técnicas de {\em zero-shot}. Por isso, os classificadores propostos serão desenvolvido utilizando o córpus UstanceBR.
+
+Para a avaliação da qualidade do classificador {\em zero-shot}, seus resultados serão comparados com os de um {\em baseline in-domain}. Os resultados dos experimentos serão divididos por alvo, de acordo com as definições presentes na seção \ref{sec:ustancebr}. As métricas de avaliação utilizadas serão a medida F, a precisão, a revocação e a acurácia. Por fim, os resultados do classificador {\em zero-shot} final serão comparados com o {\em baseline in-domain} por meio de testes de significância estatística.
+
+As atividades que serão realizadas durante o projeto são detalhadas a seguir, e estão divididas em duas partes. A primeira delas é focada no desenvolvimento de um classificador {\em in-domain}, explorando atributos não-textuais e representações relacionais de atributos comportamentais. A segunda parte diz respeito às atividades que serão realizadas caso o projeto se extenda por mais três anos, e foca no desenvolvimento de um classificador {\em zero-shot} sem o uso de dados textuais. A duração de cada atividade se encontra no quadro \ref{qua:cronograma}.
+
+\begin{itemize}
+    \item \textbf{Parte 1:} Desenvolvimento do classificador {\em in-domain}.
+    \begin{enumerate}    
+        \item \textbf{Desenvolvimento de modelos com representações relacionais:} Desenvolvimento de modelos com representações relacionais de atributos comportamentais, como a técnica {\em node2vec}.
+    
+        \item \textbf{Experimentos com modelos com atributos não-textuais:} Desenvolvimento de modelos que incorporem atributos não-textuais, como dados temporais e demográficos.
+    
+        \item \textbf{Desenvolvimento de métodos de combinação dos modelos:} Desenvolvimento de métodos de combinação dos resultados dos dois tipos de modelos desenvolvidos anteriormente, considerando também modelos textuais.
+    
+        \item \textbf{Treino, teste e validação:} Treino, otimização de hiperparâmetros e teste dos classificadores escolhidos, seguido da avaliação do resultado dos classificadores finais.
+    
+        \item \textbf{Análise de erro e interpretabilidade:} Análise dos erros cometidos pelos modelos e exploração de técnicas de interpretabilidade. Também será realizado um estudo das características mais importantes para a separação das classes.
+
+    \end{enumerate}
+    \item \textbf{Parte 2:} Desenvolvimento do classificador {\em zero-shot}.
+    \begin{enumerate}
+        \item \textbf{Revisão Bibliográfica:} Revisão exploratória de trabalhos de detecção de posicionamentos em redes sociais que utilizam modelos Zero-Shot.
+    
+        \item \textbf{Definição do tipo de {\em zero-shot}:} Definição da estratégia de {\em zero-shot} a ser utilizada.
+    
+        \item \textbf{Desenvolvimento de {\em baselines zero-shot}:} Desenvolvimento de modelos de {\em baseline} que também utilizam técnicas de {\em zero-shot}.
+    
+        \item \textbf{Desenvolvimento do modelo proposto:} Desenvolvimento do modelo {\em zero-shot} seguindo a estratégia definida anteriormente.
+    
+        \item \textbf{Treino, teste e validação:} Treino, otimização de hiperparâmetros e teste dos classificadores escolhidos, seguido da avaliação do resultado dos classificadores finais.
+    
+        \item \textbf{Análise de erro e interpretabilidade:} Análise dos erros cometidos pelos modelos e exploração de técnicas de interpretabilidade. Também será realizado um estudo das características mais importantes para a separação das classes.
+        
+        \item \textbf{Redação da Dissertação}. 
+        
+        \item \textbf{Divulgação}.
+    \end{enumerate}
+\end{itemize}
+
+\begin{quadro}[H]
+	\centering
+	\caption{Cronograma de atividades}
+% 	\resizebox{\textwidth}{!}{
+% 	\begin{tabular}{| cl | cccccccccccc | }
+%     \hline
+%     \multicolumn{2}{|c|}{\textbf{Atividade}}&
+%     \multicolumn{12}{c|}{\textbf{2023}}\\
+%     Núm. & Descrição & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12\\
+%     \hline
+%     1 & Revisão Bibliográfica & X & X & X & X & X & X & X & X & X & X & X & \\
+%     2 & Exploração e limpeza dos dados & X & X & X & X & X & X & & & & & & \\
+%     3 & Extração de características do usuário & & X & X & & & & & & & & & \\
+%     4 & Extração de características da rede & & X & X & & & & & & & & & \\
+%     5 & Combinação dos atributos textuais e não-textuais & & X & X & & & & & & & & & \\
+%     6 & Implementação dos classificadores {\em baseline} & & & X & X & X & & & & & & & \\
+%     7 & Implementação do classificador proposto & & & & X & X & X & X & & & & & \\
+%     8 & Treinamento e teste & & & X & X & X & X & X & & & & & \\
+%     9 & Avaliação & & & & & & & X & X & & & & \\
+%     10 & Análise dos atributos & & & & & & & & X & X & X & & \\
+%     11 & Análise comparativa dos resultados & & & & & & & & & X & X & X & \\
+%     12 & Redação da Monografia & X & X & X & X & X & X & X & X & X & X & X & X \\
+%     13 & Divulgação & & & & & & & & X & X & X & X & X \\
+%     \hline
+% 	\end{tabular}
+% 	}
+	\label{qua:cronograma}
+\end{quadro}
+
+Este trabalho se propõe a expandir o conhecimento da área de detecção de posicionamentos em redes sociais, em especial no que diz respeito ao uso de modelos {\em zero-shot} sem o uso de dados textuais. Especificamente, o projeto disponibilizará:
+
+\begin{itemize}
+    \item Um classificador {\em in-domain} de detecção de posicionamentos que combina atributos textuais, não-textuais e comportamentais;
+    \item Um classificador {\em zero-shot} de detecção de posicionamentos que não utiliza dados textuais.
+\end{itemize}
+
+Os resultados apresentados neste projeto estão limitados ao córpus {\em UstanceBR}. Dessa forma, o estudo está limitado aos tópicos e atributos presentes no córpus em questão (cf. \ref{sec:ustancebr}). Além disso, no que diz respeito a modelos textuais, o trabalho está limitado ao idioma português.
+
+\bibliography{referencias}
+\begin{apendicesenv}
+\end{apendicesenv}
+\begin{anexosenv}
+\end{anexosenv}
+\end{document}
